@@ -14,7 +14,9 @@ export const metadata: Metadata = {
   },
   description:
     "Website resmi TEKAD — Unit Kegiatan Mahasiswa Universitas Negeri Makassar yang bergerak di bidang jurnalistik dan media kampus.",
-  metadataBase: new URL("https://tekad.unm.ac.id"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://tekad-unm.vercel.app"
+  ),
 };
 
 export default function RootLayout({

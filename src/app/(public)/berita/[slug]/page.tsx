@@ -29,7 +29,11 @@ const dummyArticle = {
   ],
 };
 
-export function generateMetadata(): Metadata {
+export function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Metadata {
   return {
     title: dummyArticle.title,
     description: dummyArticle.content[0].slice(0, 160) + "...",
@@ -40,7 +44,11 @@ export function generateMetadata(): Metadata {
    DETAIL BERITA PAGE
    ═══════════════════════════════════════════════ */
 
-export default function DetailBeritaPage() {
+export default function DetailBeritaPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   return (
     <>
       {/* ─────────────── ARTICLE HEADER ─────────────── */}

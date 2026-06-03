@@ -23,13 +23,20 @@ export const metadata: Metadata = {
    ═══════════════════════════════════════════════ */
 
 export default async function BeritaPage() {
-  const supabase = createClient();
+  let berita: any[] | null = null;
 
-  const { data: berita } = await supabase
-    .from("news_articles")
-    .select("*")
-    .eq("status", "published")
-    .order("created_at", { ascending: false });
+  try {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("news_articles")
+      .select("*")
+      .eq("status", "published")
+      .order("created_at", { ascending: false });
+    berita = data;
+  } catch (err) {
+    console.error("Failed to fetch news:", err);
+    berita = [];
+  }
 
   return (
     <>
