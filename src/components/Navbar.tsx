@@ -1,0 +1,435 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  Search,
+  ChevronDown,
+  X,
+  Users,
+  Eye,
+  Layers,
+  Newspaper,
+  ImageIcon,
+  CalendarDays,
+  UserPlus,
+  AtSign,
+  PlayCircle,
+  Mail,
+} from "lucide-react";
+
+/* ═══════════════════════════════════════════════
+   NAVIGATION DATA
+   ═══════════════════════════════════════════════ */
+
+interface SubLink {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  desc: string;
+}
+
+interface NavItem {
+  label: string;
+  href?: string;
+  children?: SubLink[];
+}
+
+const navItems: NavItem[] = [
+  { label: "Beranda", href: "/" },
+  {
+    label: "Profil",
+    children: [
+      {
+        href: "/tentang",
+        label: "Tentang Kami",
+        icon: Users,
+        desc: "Sejarah & profil TEKAD UNM",
+      },
+      {
+        href: "/tentang#visi-misi",
+        label: "Visi & Misi",
+        icon: Eye,
+        desc: "Arah dan tujuan organisasi",
+      },
+      {
+        href: "/tentang#divisi",
+        label: "Divisi",
+        icon: Layers,
+        desc: "Struktur divisi TEKAD",
+      },
+    ],
+  },
+  {
+    label: "Informasi",
+    children: [
+      {
+        href: "/berita",
+        label: "Berita",
+        icon: Newspaper,
+        desc: "Berita & pengumuman terbaru",
+      },
+      {
+        href: "/galeri",
+        label: "Galeri",
+        icon: ImageIcon,
+        desc: "Dokumentasi foto kegiatan",
+      },
+      {
+        href: "/kegiatan",
+        label: "Kegiatan",
+        icon: CalendarDays,
+        desc: "Agenda & jadwal kegiatan",
+      },
+    ],
+  },
+  { label: "Pendaftaran", href: "/daftar" },
+];
+
+const socialLinks = [
+  { href: "https://instagram.com/tekadunm", icon: AtSign, label: "Instagram" },
+  { href: "https://youtube.com/@tekadunm", icon: PlayCircle, label: "YouTube" },
+  { href: "mailto:redaksi.tekad@unm.ac.id", icon: Mail, label: "Email" },
+];
+
+/* ═══════════════════════════════════════════════
+   NAVBAR COMPONENT
+   ═══════════════════════════════════════════════ */
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [mobileAccordion, setMobileAccordion] = useState<string | null>(null);
+  const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setSearchOpen(false);
+    setOpenDropdown(null);
+  }, [pathname]);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
+  const handleDropdownEnter = (label: string) => {
+    if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
+    setOpenDropdown(label);
+  };
+
+  const handleDropdownLeave = () => {
+    dropdownTimeout.current = setTimeout(() => setOpenDropdown(null), 150);
+  };
+
+  return (
+    <>
+      {/* ═══════ TOP BAR ═══════ */}
+      <div className="hidden border-b border-gray-100 bg-gray-950 lg:block">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-1.5">
+          <p className="text-[11px] font-medium text-gray-400">
+            Administrasi Bisnis — Universitas Negeri Makassar
+          </p>
+          <div className="flex items-center gap-3">
+            {socialLinks.map((s) => {
+              const Icon = s.icon;
+              return (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-500 transition-colors hover:text-white"
+                  aria-label={s.label}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════ MAIN NAVBAR ═══════ */}
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/95 shadow-lg shadow-black/5 backdrop-blur-md"
+            : "bg-white"
+        }`}
+      >
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          {/* ── Logo ── */}
+          <Link href="/" className="group flex items-center gap-2.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-md shadow-blue-600/20 transition-transform duration-200 group-hover:scale-105">
+              <span className="text-lg font-extrabold tracking-tight text-white">
+                T
+              </span>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="text-lg font-bold tracking-tight text-gray-900">
+                TEKAD
+              </span>
+              <span className="text-[10px] font-semibold tracking-[0.2em] text-blue-600">
+                UNM
+              </span>
+            </div>
+          </Link>
+
+          {/* ── Desktop Navigation ── */}
+          <ul className="hidden items-center gap-0.5 lg:flex">
+            {navItems.map((item) =>
+              item.children ? (
+                /* Dropdown menu item */
+                <li
+                  key={item.label}
+                  className="relative"
+                  onMouseEnter={() => handleDropdownEnter(item.label)}
+                  onMouseLeave={handleDropdownLeave}
+                >
+                  <button
+                    className={`flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                      item.children.some((c) => isActive(c.href))
+                        ? "text-blue-600"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    {item.label}
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                        openDropdown === item.label ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Dropdown panel */}
+                  <div
+                    className={`absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-2 transition-all duration-200 ${
+                      openDropdown === item.label
+                        ? "visible translate-y-0 opacity-100"
+                        : "invisible -translate-y-2 opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-2 shadow-xl shadow-gray-900/10">
+                      {item.children.map((child) => {
+                        const Icon = child.icon;
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={`group flex items-start gap-3 rounded-xl px-3 py-3 transition-colors duration-150 ${
+                              isActive(child.href)
+                                ? "bg-blue-50 text-blue-700"
+                                : "text-gray-700 hover:bg-gray-50"
+                            }`}
+                          >
+                            <div
+                              className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                                isActive(child.href)
+                                  ? "bg-blue-100 text-blue-600"
+                                  : "bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600"
+                              }`}
+                            >
+                              <Icon className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold">
+                                {child.label}
+                              </p>
+                              <p className="mt-0.5 text-xs text-gray-400">
+                                {child.desc}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </li>
+              ) : (
+                /* Regular link */
+                <li key={item.label}>
+                  <Link
+                    href={item.href!}
+                    className={`relative rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                      isActive(item.href!)
+                        ? "text-blue-600"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    {item.label}
+                    {isActive(item.href!) && (
+                      <span className="absolute bottom-0 left-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-blue-600" />
+                    )}
+                  </Link>
+                </li>
+              )
+            )}
+          </ul>
+
+          {/* ── Right Side ── */}
+          <div className="flex items-center gap-2">
+            {/* Search toggle */}
+            <button
+              onClick={() => setSearchOpen(!searchOpen)}
+              className="hidden h-10 w-10 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 lg:flex"
+              aria-label="Search"
+            >
+              <Search className="h-[18px] w-[18px]" />
+            </button>
+
+            {/* CTA */}
+            <Link
+              href="/daftar"
+              className="hidden items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 active:scale-[0.98] sm:inline-flex"
+            >
+              <UserPlus className="h-4 w-4" />
+              Daftar
+            </Link>
+
+            {/* Hamburger */}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="relative flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100 lg:hidden"
+              aria-label="Toggle menu"
+            >
+              <div className="flex w-5 flex-col items-center gap-[5px]">
+                <span
+                  className={`block h-[2px] w-full rounded-full bg-current transition-all duration-300 ${
+                    mobileOpen ? "translate-y-[7px] rotate-45" : ""
+                  }`}
+                />
+                <span
+                  className={`block h-[2px] w-full rounded-full bg-current transition-all duration-300 ${
+                    mobileOpen ? "scale-x-0 opacity-0" : ""
+                  }`}
+                />
+                <span
+                  className={`block h-[2px] w-full rounded-full bg-current transition-all duration-300 ${
+                    mobileOpen ? "-translate-y-[7px] -rotate-45" : ""
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
+        </nav>
+
+        {/* ═══════ SEARCH BAR (SLIDE DOWN) ═══════ */}
+        <div
+          className={`overflow-hidden border-t border-gray-100 bg-white transition-all duration-300 ${
+            searchOpen ? "max-h-20 py-3" : "max-h-0 py-0"
+          }`}
+        >
+          <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 sm:px-6">
+            <Search className="h-5 w-5 shrink-0 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Cari berita, kegiatan, atau informasi..."
+              className="w-full border-0 bg-transparent py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0"
+              autoFocus={searchOpen}
+            />
+            <button
+              onClick={() => setSearchOpen(false)}
+              className="shrink-0 rounded-md p-1 text-gray-400 hover:text-gray-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* ═══════ MOBILE MENU ═══════ */}
+        <div
+          className={`overflow-hidden border-t border-gray-100 bg-white transition-all duration-300 ease-in-out lg:hidden ${
+            mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="mx-auto max-w-7xl space-y-1 px-4 pb-5 pt-3 sm:px-6">
+            {navItems.map((item) =>
+              item.children ? (
+                <div key={item.label}>
+                  <button
+                    onClick={() =>
+                      setMobileAccordion(
+                        mobileAccordion === item.label ? null : item.label
+                      )
+                    }
+                    className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                      item.children.some((c) => isActive(c.href))
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {item.label}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform duration-200 ${
+                        mobileAccordion === item.label ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                  <div
+                    className={`overflow-hidden transition-all duration-200 ${
+                      mobileAccordion === item.label
+                        ? "max-h-60 opacity-100"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <div className="space-y-0.5 pb-2 pl-4">
+                      {item.children.map((child) => {
+                        const Icon = child.icon;
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors ${
+                              isActive(child.href)
+                                ? "bg-blue-50 font-medium text-blue-600"
+                                : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                            }`}
+                          >
+                            <Icon className="h-4 w-4" />
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={item.label}
+                  href={item.href!}
+                  className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                    isActive(item.href!)
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+            <div className="pt-3">
+              <Link
+                href="/daftar"
+                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-all hover:bg-blue-700"
+              >
+                <UserPlus className="h-4 w-4" />
+                Daftar Anggota
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+    </>
+  );
+}
