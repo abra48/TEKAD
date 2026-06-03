@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -76,8 +77,14 @@ export default function AdminLayout({
         {/* Sidebar Header / Logo */}
         <div className="flex h-16 items-center justify-between border-b border-gray-100 px-5">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-md shadow-blue-600/20">
-              <span className="text-sm font-black text-white">T</span>
+            <div className="relative h-9 w-9 overflow-hidden rounded-xl shadow-md shadow-blue-600/20">
+              <Image
+                src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
+                alt="Logo TEKAD"
+                fill
+                className="object-cover"
+                sizes="36px"
+              />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-sm font-bold tracking-tight text-gray-900">

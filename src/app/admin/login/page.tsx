@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, Mail, Eye, EyeOff, Sparkles, AlertCircle } from "lucide-react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
@@ -60,8 +61,14 @@ export default function AdminLoginPage() {
       <div className="relative w-full max-w-md">
         {/* Logo top */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-xl shadow-blue-600/25">
-            <span className="text-2xl font-black text-white">T</span>
+          <div className="relative mx-auto mb-4 h-16 w-16 overflow-hidden rounded-2xl shadow-xl shadow-blue-600/25">
+            <Image
+              src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
+              alt="Logo TEKAD"
+              fill
+              className="object-cover"
+              sizes="64px"
+            />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">
             Login Admin <span className="text-blue-700">TEKAD</span>

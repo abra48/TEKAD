@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUp } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
@@ -84,10 +85,14 @@ export default function Footer() {
             {/* ── Col 1: Logo & Deskripsi ── */}
             <div className="space-y-5">
               <Link href="/" className="group inline-flex items-center gap-2.5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 shadow-md shadow-blue-600/20 transition-transform duration-200 group-hover:scale-105">
-                  <span className="text-lg font-extrabold tracking-tight text-white">
-                    T
-                  </span>
+                <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-md shadow-blue-600/20 transition-transform duration-200 group-hover:scale-105">
+                  <Image
+                    src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
+                    alt="Logo TEKAD"
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
                 </div>
                 <div className="flex flex-col leading-none">
                   <span className="text-lg font-bold tracking-tight text-white">
