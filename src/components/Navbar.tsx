@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   ChevronDown,
@@ -119,6 +119,18 @@ export default function Navbar() {
     setOpenDropdown(null);
   }, [pathname]);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
@@ -172,23 +184,11 @@ export default function Navbar() {
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           {/* ── Logo ── */}
           <Link href="/" className="group flex items-center gap-2.5">
-            <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-md shadow-blue-600/20 transition-transform duration-200 group-hover:scale-105">
-              <Image
-                src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
-                alt="Logo TEKAD"
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="text-lg font-bold tracking-tight text-gray-900">
-                TEKAD
-              </span>
-              <span className="text-[10px] font-semibold tracking-[0.2em] text-blue-600">
-                UNM
-              </span>
-            </div>
+            <img
+              src="https://i.ibb.co.com/fVJ90RRP/Untitled-design.png"
+              alt="Logo TEKAD"
+              className="h-10 w-auto"
+            />
           </Link>
 
           {/* ── Desktop Navigation ── */}
@@ -352,88 +352,130 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* ═══════ MOBILE MENU ═══════ */}
-        <div
-          className={`overflow-hidden border-t border-gray-100 bg-white transition-all duration-300 ease-in-out lg:hidden ${
-            mobileOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
-          }`}
-        >
-          <div className="mx-auto max-w-7xl space-y-1 px-4 pb-5 pt-3 sm:px-6">
-            {navItems.map((item) =>
-              item.children ? (
-                <div key={item.label}>
-                  <button
-                    onClick={() =>
-                      setMobileAccordion(
-                        mobileAccordion === item.label ? null : item.label
-                      )
-                    }
-                    className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
-                      item.children.some((c) => isActive(c.href))
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    {item.label}
-                    <ChevronDown
-                      className={`h-4 w-4 transition-transform duration-200 ${
-                        mobileAccordion === item.label ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
-                  <div
-                    className={`overflow-hidden transition-all duration-200 ${
-                      mobileAccordion === item.label
-                        ? "max-h-60 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    <div className="space-y-0.5 pb-2 pl-4">
-                      {item.children.map((child) => {
-                        const Icon = child.icon;
-                        return (
-                          <Link
-                            key={child.href}
-                            href={child.href}
-                            className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors ${
-                              isActive(child.href)
-                                ? "bg-blue-50 font-medium text-blue-600"
-                                : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                            }`}
+        {/* ═══════ MOBILE MENU (FRAMER MOTION) ═══════ */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="overflow-hidden border-t border-gray-100 bg-white lg:hidden"
+            >
+              <div className="mx-auto max-w-7xl space-y-1 px-4 pb-5 pt-3 sm:px-6">
+                {navItems.map((item, idx) =>
+                  item.children ? (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        ease: "easeInOut",
+                        delay: idx * 0.05,
+                      }}
+                    >
+                      <button
+                        onClick={() =>
+                          setMobileAccordion(
+                            mobileAccordion === item.label ? null : item.label
+                          )
+                        }
+                        className={`flex w-full items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                          item.children.some((c) => isActive(c.href))
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {item.label}
+                        <motion.div
+                          animate={{
+                            rotate:
+                              mobileAccordion === item.label ? 180 : 0,
+                          }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </button>
+                      <AnimatePresence>
+                        {mobileAccordion === item.label && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
                           >
-                            <Icon className="h-4 w-4" />
-                            {child.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <Link
-                  key={item.label}
-                  href={item.href!}
-                  className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
-                    isActive(item.href!)
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                            <div className="space-y-0.5 pb-2 pl-4">
+                              {item.children.map((child) => {
+                                const Icon = child.icon;
+                                return (
+                                  <Link
+                                    key={child.href}
+                                    href={child.href}
+                                    className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-colors ${
+                                      isActive(child.href)
+                                        ? "bg-blue-50 font-medium text-blue-600"
+                                        : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                                    }`}
+                                  >
+                                    <Icon className="h-4 w-4" />
+                                    {child.label}
+                                  </Link>
+                                );
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.3,
+                        ease: "easeInOut",
+                        delay: idx * 0.05,
+                      }}
+                    >
+                      <Link
+                        href={item.href!}
+                        className={`flex items-center rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                          isActive(item.href!)
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    </motion.div>
+                  )
+                )}
+                <motion.div
+                  className="pt-3"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.3,
+                    ease: "easeInOut",
+                    delay: navItems.length * 0.05,
+                  }}
                 >
-                  {item.label}
-                </Link>
-              )
-            )}
-            <div className="pt-3">
-              <Link
-                href="/daftar"
-                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-all hover:bg-blue-700"
-              >
-                <UserPlus className="h-4 w-4" />
-                Daftar Anggota
-              </Link>
-            </div>
-          </div>
-        </div>
+                  <Link
+                    href="/daftar"
+                    className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-all hover:bg-blue-700"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    Daftar Anggota
+                  </Link>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
     </>
   );

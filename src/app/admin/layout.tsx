@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Newspaper,
@@ -16,6 +16,7 @@ import {
   X,
   ChevronRight,
   Bell,
+  BookOpen,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
@@ -27,6 +28,7 @@ const sidebarLinks = [
   { href: "/admin/berita", label: "Berita", icon: Newspaper },
   { href: "/admin/pendaftaran", label: "Pendaftaran", icon: UserPlus },
   { href: "/admin/galeri", label: "Galeri", icon: ImageIcon },
+  { href: "/admin/program", label: "Program Kami", icon: BookOpen },
   { href: "/admin/kegiatan", label: "Kegiatan", icon: CalendarDays },
   { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
 ];
@@ -48,6 +50,18 @@ export default function AdminLayout({
     setSidebarOpen(false);
   }, [pathname]);
 
+  // Lock body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen]);
+
   // Halaman login tidak pakai layout dashboard
   if (pathname === "/admin/login") {
     return <>{children}</>;
@@ -61,12 +75,18 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-gray-50/80">
       {/* ── Mobile Overlay ── */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm transition-opacity lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ── SIDEBAR ── */}
       <aside
@@ -77,15 +97,11 @@ export default function AdminLayout({
         {/* Sidebar Header / Logo */}
         <div className="flex h-16 items-center justify-between border-b border-gray-100 px-5">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="relative h-9 w-9 overflow-hidden rounded-xl shadow-md shadow-blue-600/20">
-              <Image
-                src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
-                alt="Logo TEKAD"
-                fill
-                className="object-cover"
-                sizes="36px"
-              />
-            </div>
+            <img
+              src="https://i.ibb.co.com/fVJ90RRP/Untitled-design.png"
+              alt="Logo TEKAD"
+              className="h-9 w-auto"
+            />
             <div className="flex flex-col leading-none">
               <span className="text-sm font-bold tracking-tight text-gray-900">
                 TEKAD Admin
