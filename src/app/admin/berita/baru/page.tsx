@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useRef } from "react";
+import { useState, useEffect, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -34,14 +34,10 @@ import { uploadFile } from "@/lib/supabase/storage";
    FORM EDITOR BERITA BARU
    ═══════════════════════════════════════════════ */
 
-const categories = [
-  "Kegiatan",
-  "Pengumuman",
-  "Akademik",
-  "Prestasi",
-  "Organisasi",
-  "Opini",
-];
+interface Category {
+  id: string;
+  name: string;
+}
 
 const toolbarButtons = [
   { icon: Bold, label: "Bold" },
@@ -80,13 +76,36 @@ export default function BeritaBaruPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [excerpt, setExcerpt] = useState("");
-  const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState("draft");
   const [featured, setFeatured] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // ── Fetch categories from Supabase ──
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("categories")
+          .select("id, name")
+          .order("name", { ascending: true });
+
+        if (error) {
+          console.error("Error fetching categories:", error);
+        } else {
+          setCategories(data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   // ── Handle file input ──
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,7 +167,7 @@ export default function BeritaBaruPage() {
           slug,
           content,
           excerpt: excerpt || null,
-          category,
+          category_id: categoryId || null,
           status,
           is_featured: featured,
           thumbnail_url: imageUrl,
@@ -362,7 +381,7 @@ export default function BeritaBaruPage() {
             </div>
           </div>
 
-          {/* Kategori */}
+          {/* Kategori — fetched from Supabase */}
           <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white">
             <div className="border-b border-gray-100 px-5 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -371,17 +390,22 @@ export default function BeritaBaruPage() {
             </div>
             <div className="p-5">
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
                 className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
               >
                 <option value="">— Pilih Kategori —</option>
                 {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                  <option key={c.id} value={c.id}>
+                    {c.name}
                   </option>
                 ))}
               </select>
+              {categories.length === 0 && (
+                <p className="mt-2 text-xs text-gray-400">
+                  Memuat kategori...
+                </p>
+              )}
             </div>
           </div>
 

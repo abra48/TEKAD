@@ -404,8 +404,13 @@ export default function TentangPage() {
 
               <div className="relative flex flex-col items-center text-center">
                 {/* Avatar */}
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 shadow-lg shadow-amber-500/25 ring-4 ring-amber-100">
-                  <Crown className="h-9 w-9 text-white" />
+                <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full shadow-lg shadow-amber-500/25 ring-4 ring-amber-100">
+                  <Image
+                    src="https://i.ibb.co.com/B2kXbX1B/Untitled-design-2.png"
+                    alt={pembina.name}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
 
                 {/* Badge */}

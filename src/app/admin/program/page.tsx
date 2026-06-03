@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   BookOpen,
   Plus,
@@ -105,15 +106,13 @@ export default function AdminProgramPage() {
             Tambah, edit, dan kelola program yang ditampilkan di halaman publik.
           </p>
         </div>
-        <button
-          onClick={() =>
-            alert("Form tambah program segera hadir")
-          }
+        <Link
+          href="/admin/program/baru"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/25 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/30 active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
           Tambah Program
-        </button>
+        </Link>
       </div>
 
       {/* ── Search & Actions Bar ── */}
