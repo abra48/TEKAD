@@ -98,7 +98,7 @@ export default function AdminLayout({
         <div className="flex h-16 items-center justify-between border-b border-gray-100 px-5">
           <Link href="/admin" className="flex items-center gap-2.5">
             <img
-              src="https://i.ibb.co.com/fVJ90RRP/Untitled-design.png"
+              src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
               alt="Logo TEKAD"
               className="h-9 w-auto"
             />

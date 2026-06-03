@@ -283,89 +283,6 @@ export default function BerandaPage() {
       </section>
 
 
-      {/* ─────────────── PROGRAM KAMI ─────────────── */}
-      <motion.section
-        id="program-kami"
-        className="py-16 sm:py-20 md:py-28"
-        {...sectionAnim}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="mb-10 text-center sm:mb-14">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700">
-              <BookOpen className="h-4 w-4" />
-              <span>Layanan</span>
-            </div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
-              Program Kami
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-500 sm:text-base">
-              Berbagai program unggulan yang kami jalankan untuk mengembangkan potensi mahasiswa di bidang media dan jurnalistik.
-            </p>
-          </div>
-
-          {/* Programs Grid */}
-          {loadingPrograms ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-2xl border border-gray-200/80 bg-white p-6 sm:p-8"
-                >
-                  <div className="mb-4 h-12 w-12 rounded-xl bg-gray-200" />
-                  <div className="mb-2 h-5 w-2/3 rounded bg-gray-200" />
-                  <div className="h-4 w-full rounded bg-gray-100" />
-                  <div className="mt-1 h-4 w-4/5 rounded bg-gray-100" />
-                </div>
-              ))}
-            </div>
-          ) : programs.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
-              {programs.map((program, idx) => (
-                <motion.div
-                  key={program.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, ease: "easeOut", delay: idx * 0.1 }}
-                  className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 sm:p-8"
-                >
-                  {/* Accent gradient bg on hover */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${
-                      programColors[idx % programColors.length]
-                    } opacity-0 transition-opacity duration-500 group-hover:opacity-[0.03]`}
-                  />
-                  <div className="relative">
-                    <div
-                      className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${
-                        programColors[idx % programColors.length]
-                      } shadow-md transition-transform duration-300 group-hover:scale-110`}
-                    >
-                      <BookOpen className="h-5 w-5 text-white" />
-                    </div>
-                    <h3 className="mb-2 text-base font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-lg">
-                      {program.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-gray-500">
-                      {program.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            /* Fallback if no programs found */
-            <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/50 p-10 text-center sm:p-16">
-              <BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-300" />
-              <p className="text-sm font-medium text-gray-400">
-                Program akan segera ditampilkan.
-              </p>
-            </div>
-          )}
-        </div>
-      </motion.section>
-
       {/* ─────────────── BERITA TERBARU (PORTAL STYLE) ─────────────── */}
       <motion.section
         id="berita-terbaru"
@@ -471,6 +388,90 @@ export default function BerandaPage() {
           </div>
         </div>
       </motion.section>
+
+      {/* ─────────────── PROGRAM KAMI ─────────────── */}
+      <motion.section
+        id="program-kami"
+        className="py-16 sm:py-20 md:py-28"
+        {...sectionAnim}
+      >
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <div className="mb-10 text-center sm:mb-14">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700">
+              <BookOpen className="h-4 w-4" />
+              <span>Layanan</span>
+            </div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+              Program Kami
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-500 sm:text-base">
+              Berbagai program unggulan yang kami jalankan untuk mengembangkan potensi mahasiswa di bidang media dan jurnalistik.
+            </p>
+          </div>
+
+          {/* Programs Grid */}
+          {loadingPrograms ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="animate-pulse rounded-2xl border border-gray-200/80 bg-white p-6 sm:p-8"
+                >
+                  <div className="mb-4 h-12 w-12 rounded-xl bg-gray-200" />
+                  <div className="mb-2 h-5 w-2/3 rounded bg-gray-200" />
+                  <div className="h-4 w-full rounded bg-gray-100" />
+                  <div className="mt-1 h-4 w-4/5 rounded bg-gray-100" />
+                </div>
+              ))}
+            </div>
+          ) : programs.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
+              {programs.map((program, idx) => (
+                <motion.div
+                  key={program.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, ease: "easeOut" as const, delay: idx * 0.1 }}
+                  className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 sm:p-8"
+                >
+                  {/* Accent gradient bg on hover */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${
+                      programColors[idx % programColors.length]
+                    } opacity-0 transition-opacity duration-500 group-hover:opacity-[0.03]`}
+                  />
+                  <div className="relative">
+                    <div
+                      className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${
+                        programColors[idx % programColors.length]
+                      } shadow-md transition-transform duration-300 group-hover:scale-110`}
+                    >
+                      <BookOpen className="h-5 w-5 text-white" />
+                    </div>
+                    <h3 className="mb-2 text-base font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-lg">
+                      {program.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed text-gray-500">
+                      {program.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            /* Fallback if no programs found */
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/50 p-10 text-center sm:p-16">
+              <BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-300" />
+              <p className="text-sm font-medium text-gray-400">
+                Program akan segera ditampilkan.
+              </p>
+            </div>
+          )}
+        </div>
+      </motion.section>
+
 
       {/* ─────────────── COMPANY PROFILE SECTION ─────────────── */}
       <motion.section

@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
         <div className="mb-8 text-center">
           <div className="relative mx-auto mb-4 h-16 w-16 overflow-hidden rounded-2xl shadow-xl shadow-blue-600/25">
             <Image
-              src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
+              src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
               alt="Logo TEKAD"
               fill
               className="object-cover"

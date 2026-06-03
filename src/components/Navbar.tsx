@@ -185,7 +185,7 @@ export default function Navbar() {
           {/* ── Logo ── */}
           <Link href="/" className="group flex items-center gap-2.5">
             <img
-              src="https://i.ibb.co.com/fVJ90RRP/Untitled-design.png"
+              src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
               alt="Logo TEKAD"
               className="h-10 w-auto"
             />

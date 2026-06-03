@@ -87,7 +87,7 @@ export default function Footer() {
               <Link href="/" className="group inline-flex items-center gap-2.5">
                 <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-md shadow-blue-600/20 transition-transform duration-200 group-hover:scale-105">
                   <Image
-                    src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
+                    src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
                     alt="Logo TEKAD"
                     fill
                     className="object-cover"

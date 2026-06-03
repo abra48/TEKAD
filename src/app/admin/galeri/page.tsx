@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Plus,
   Pencil,
@@ -80,10 +81,13 @@ export default function AdminGaleriPage() {
             Upload, edit, dan kelola foto dokumentasi kegiatan
           </p>
         </div>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]">
+        <Link
+          href="/admin/galeri/baru"
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]"
+        >
           <Plus className="h-4 w-4" />
           Upload Foto
-        </button>
+        </Link>
       </div>
 
       {/* ── Grid View ── */}

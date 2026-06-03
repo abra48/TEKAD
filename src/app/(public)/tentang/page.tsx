@@ -220,7 +220,7 @@ export default function TentangPage() {
               <div className="mb-6 flex items-center gap-4">
                 <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-600/15 ring-1 ring-gray-100">
                   <Image
-                    src="https://i.ibb.co.com/ZbtrwQw/Gemini-Generated-Image.png"
+                    src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
                     alt="Logo TEKAD UNM"
                     width={56}
                     height={56}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Plus,
   Search,
@@ -84,10 +85,13 @@ export default function AdminBeritaPage() {
             Kelola artikel, berita, dan pengumuman TEKAD UNM
           </p>
         </div>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]">
+        <Link
+          href="/admin/berita/baru"
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]"
+        >
           <Plus className="h-4 w-4" />
           Tulis Berita Baru
-        </button>
+        </Link>
       </div>
 
       {/* ── Search ── */}
