@@ -16,10 +16,15 @@ export async function uploadFile(
 ): Promise<string> {
   const supabase = createClient();
 
-  // Buat nama file unik: timestamp + nama asli (tanpa spasi)
-  const timestamp = Date.now();
-  const safeName = file.name.replace(/\s+/g, "-").toLowerCase();
-  const filePath = `${folder}/${timestamp}-${safeName}`;
+  // ── Sanitasi nama file ──
+  // Ambil ekstensi file
+  const fileExt = file.name.split(".").pop() || "png";
+  // Hapus ekstensi, lalu bersihkan semua karakter kecuali huruf & angka
+  const cleanName = file.name
+    .replace(/\.[^/.]+$/, "")
+    .replace(/[^a-zA-Z0-9]/g, "");
+  // Buat path unik: folder/timestamp-namafile.ext
+  const filePath = `${folder}/${Date.now()}-${cleanName}.${fileExt}`;
 
   // Upload ke storage
   const { error } = await supabase.storage
