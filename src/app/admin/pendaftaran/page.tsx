@@ -10,6 +10,7 @@ import {
   UserPlus,
   Filter,
   Loader2,
+  MessageCircle,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -187,6 +188,18 @@ export default function AdminPendaftaranPage() {
                         >
                           <Eye className="h-4 w-4" />
                         </Link>
+                        {/* WhatsApp Button */}
+                        {item.whatsapp_number && (
+                          <a
+                            href={`https://wa.me/${item.whatsapp_number.startsWith("0") ? "62" + item.whatsapp_number.substring(1) : item.whatsapp_number}?text=Halo%20${encodeURIComponent(item.full_name || "")},%20kami%20dari%20TEKAD%20UNM.%20Terima%20kasih%20sudah%20mendaftar!`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Hubungi via WhatsApp"
+                            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </a>
+                        )}
                         <button
                           title="Terima"
                           className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600"

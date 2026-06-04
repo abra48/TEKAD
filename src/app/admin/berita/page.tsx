@@ -9,12 +9,12 @@ import {
   Pencil,
   Trash2,
   Newspaper,
-  MoreVertical,
   RefreshCw,
   Eye,
   CheckCircle2,
   Clock,
   Archive,
+  Rocket,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -127,6 +127,28 @@ export default function AdminBeritaPage() {
       }
     } catch (err) {
       console.error("Delete error:", err);
+    }
+  };
+
+  // Quick Publish
+  const handlePublish = async (id: string) => {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("news_articles")
+        .update({ status: "published" })
+        .eq("id", id);
+      if (error) {
+        alert(`Gagal publish: ${error.message}`);
+      } else {
+        setArticles((prev) =>
+          prev.map((a) =>
+            a.id === id ? { ...a, status: "published" } : a
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Publish error:", err);
     }
   };
 
@@ -295,31 +317,41 @@ export default function AdminBeritaPage() {
                       </td>
                       {/* Actions */}
                       <td className="px-5 py-4">
-                        <div className="relative inline-block">
-                          <div className="flex items-center gap-1">
-                            <Link
-                              href={`/admin/berita/${item.id}`}
-                              title="Lihat"
-                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Link>
+                        <div className="flex items-center gap-1">
+                          {/* Preview di halaman publik */}
+                          <Link
+                            href={`/berita/${item.slug || item.id}`}
+                            target="_blank"
+                            title="Preview"
+                            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          {/* Quick Publish (hanya untuk draft) */}
+                          {item.status === "draft" && (
                             <button
-                              title="Edit"
-                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                              title="Publish Sekarang"
+                              onClick={() => handlePublish(item.id)}
+                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-emerald-50 hover:text-emerald-600"
                             >
-                              <Pencil className="h-4 w-4" />
+                              <Rocket className="h-4 w-4" />
                             </button>
-                            <button
-                              title="Hapus"
-                              onClick={() =>
-                                handleDelete(item.id, item.title)
-                              }
-                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
+                          )}
+                          <button
+                            title="Edit"
+                            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                          <button
+                            title="Hapus"
+                            onClick={() =>
+                              handleDelete(item.id, item.title)
+                            }
+                            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
                         </div>
                       </td>
                     </tr>
