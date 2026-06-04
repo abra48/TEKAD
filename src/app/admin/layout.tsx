@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Bell,
   BookOpen,
+  Users,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
@@ -30,6 +31,7 @@ const sidebarLinks = [
   { href: "/admin/galeri", label: "Galeri", icon: ImageIcon },
   { href: "/admin/program", label: "Program Kami", icon: BookOpen },
   { href: "/admin/kegiatan", label: "Kegiatan", icon: CalendarDays },
+  { href: "/admin/struktur", label: "Struktur Organisasi", icon: Users },
   { href: "/admin/pengaturan", label: "Pengaturan", icon: Settings },
 ];
 

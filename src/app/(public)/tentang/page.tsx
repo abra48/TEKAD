@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
@@ -14,19 +15,40 @@ import {
   User,
   Crown,
   Award,
+  Loader2,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 /* ═══════════════════════════════════════════════
-   DATA STRUKTUR ORGANISASI
+   TYPES
    ═══════════════════════════════════════════════ */
 
-const pembina = {
-  name: "Dr. Ir. Muh. Rizal S, ST., S. AN., M. Pd., IPM",
-  role: "Pembina",
-};
+interface OrgMember {
+  id: string;
+  name: string;
+  role: string;       // 'Pembina' | 'Penanggung Jawab' | 'Anggota'
+  division: string;   // 'Pusat' | 'Website' | 'Instagram' | 'TikTok' | 'YouTube'
+  image_url: string | null;
+}
 
-const divisiData = [
+/* ═══════════════════════════════════════════════
+   DIVISI CONFIG  (styling only — no data)
+   ═══════════════════════════════════════════════ */
+
+const divisiConfig: Record<
+  string,
   {
+    name: string;
+    icon: typeof Globe;
+    accent: string;
+    accentBg: string;
+    iconBg: string;
+    iconColor: string;
+    ringColor: string;
+    glowColor: string;
+  }
+> = {
+  Website: {
     name: "Divisi Website",
     icon: Globe,
     accent: "from-blue-600 to-blue-400",
@@ -35,17 +57,8 @@ const divisiData = [
     iconColor: "text-blue-600",
     ringColor: "ring-blue-500/20",
     glowColor: "hover:shadow-blue-500/20",
-    pj: [
-      "Aryan Agus Pratama, S.TP., MM",
-      "Nurhasni Muis, SE., MM",
-    ],
-    anggota: [
-      "Rahmania Azzahra",
-      "Early Amelia Ramadani",
-      "Muhammad Makbul",
-    ],
   },
-  {
+  Instagram: {
     name: "Divisi Instagram",
     icon: AtSign,
     accent: "from-pink-500 to-purple-500",
@@ -54,15 +67,8 @@ const divisiData = [
     iconColor: "text-pink-600",
     ringColor: "ring-pink-500/20",
     glowColor: "hover:shadow-pink-500/20",
-    pj: ["Alifia Ainun Rizky, S.Psi., M.Psi., Psikolog"],
-    anggota: [
-      "Nala Rezkyanti",
-      "Muh Ardiansyah",
-      "Nurhalisah",
-      "Muh Fadhil Rizal",
-    ],
   },
-  {
+  TikTok: {
     name: "Divisi TikTok",
     icon: Film,
     accent: "from-slate-700 to-gray-500",
@@ -71,14 +77,8 @@ const divisiData = [
     iconColor: "text-slate-700",
     ringColor: "ring-slate-500/20",
     glowColor: "hover:shadow-slate-500/20",
-    pj: ["Arsianita Nur Fattah, S.IP., MPA"],
-    anggota: [
-      "Ratu Zalzhabila",
-      "Riopuji Nurulita",
-      "Nur Rahmaniar",
-    ],
   },
-  {
+  YouTube: {
     name: "Divisi YouTube",
     icon: Play,
     accent: "from-red-500 to-red-400",
@@ -87,14 +87,11 @@ const divisiData = [
     iconColor: "text-red-600",
     ringColor: "ring-red-500/20",
     glowColor: "hover:shadow-red-500/20",
-    pj: ["Dr. Maya Kasmita, S.STP., M.A.P"],
-    anggota: [
-      "Cahaya Jailani Umar",
-      "Debora Kezia Lengkei",
-      "Armi Dianti",
-    ],
   },
-];
+};
+
+/** Urutan divisi agar konsisten di grid */
+const divisionOrder = ["Website", "Instagram", "TikTok", "YouTube"] as const;
 
 const misiList = [
   "Menyajikan informasi yang akurat, terpercaya, dan bermanfaat bagi seluruh civitas akademika.",
@@ -153,6 +150,46 @@ const scaleIn = {
    ═══════════════════════════════════════════════ */
 
 export default function TentangPage() {
+  const [members, setMembers] = useState<OrgMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchOrgStructure() {
+      try {
+        const supabase = createClient();
+        const { data, error: fetchError } = await supabase
+          .from("org_structure")
+          .select("*");
+
+        if (fetchError) throw fetchError;
+        setMembers(data as OrgMember[]);
+      } catch (err: unknown) {
+        console.error("Failed to fetch org structure:", err);
+        setError("Gagal memuat data struktur organisasi.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchOrgStructure();
+  }, []);
+
+  /* ── Derived Data ── */
+  const pembinaList = members.filter((m) => m.division === "Pusat");
+  const pembinaData = pembinaList[0] ?? null;
+
+  const divisiData = divisionOrder.map((divKey) => {
+    const config = divisiConfig[divKey];
+    const teamMembers = members.filter((m) => m.division === divKey);
+    return {
+      ...config,
+      divisionKey: divKey,
+      pj: teamMembers.filter((m) => m.role === "Penanggung Jawab"),
+      anggota: teamMembers.filter((m) => m.role === "Anggota"),
+    };
+  });
+
   return (
     <>
       {/* ─────────────── HEADER ─────────────── */}
@@ -379,6 +416,17 @@ export default function TentangPage() {
           </motion.div>
 
           {/* ── PEMBINA CARD (Puncak) ── */}
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              <p className="mt-3 text-sm text-gray-400">Memuat struktur organisasi…</p>
+            </div>
+          ) : error ? (
+            <div className="mx-auto max-w-lg rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          ) : (
+            <>
           <motion.div
             className="mx-auto mb-4 max-w-lg"
             initial="hidden"
@@ -405,23 +453,29 @@ export default function TentangPage() {
               <div className="relative flex flex-col items-center text-center">
                 {/* Avatar */}
                 <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full shadow-lg shadow-amber-500/25 ring-4 ring-amber-100">
-                  <Image
-                    src="https://i.ibb.co.com/B2kXbX1B/Untitled-design-2.png"
-                    alt={pembina.name}
-                    fill
-                    className="object-cover"
-                  />
+                  {pembinaData?.image_url ? (
+                    <Image
+                      src={pembinaData.image_url}
+                      alt={pembinaData.name}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-yellow-50">
+                      <Crown className="h-8 w-8 text-amber-500" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Badge */}
                 <span className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-1 text-xs font-bold uppercase tracking-wider text-amber-800 ring-1 ring-amber-300/40">
                   <Award className="h-3.5 w-3.5" />
-                  {pembina.role}
+                  {pembinaData?.role ?? "Pembina"}
                 </span>
 
                 {/* Name */}
                 <h3 className="text-lg font-bold leading-snug text-gray-900 sm:text-xl">
-                  {pembina.name}
+                  {pembinaData?.name ?? "—"}
                 </h3>
               </div>
             </motion.div>
@@ -506,14 +560,30 @@ export default function TentangPage() {
                         <Award className="h-3 w-3" />
                         Penanggung Jawab
                       </p>
-                      <div className="space-y-1.5">
-                        {div.pj.map((name, idx) => (
-                          <p
-                            key={idx}
-                            className="text-sm font-semibold leading-snug text-gray-800"
+                      <div className="space-y-2.5">
+                        {div.pj.map((member, idx) => (
+                          <div
+                            key={member.id ?? idx}
+                            className="flex items-center gap-2.5"
                           >
-                            {name}
-                          </p>
+                            <div className={`relative h-8 w-8 shrink-0 overflow-hidden rounded-full ring-2 ${div.ringColor}`}>
+                              {member.image_url ? (
+                                <Image
+                                  src={member.image_url}
+                                  alt={member.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <span className={`flex h-full w-full items-center justify-center ${div.iconBg}`}>
+                                  <Crown className={`h-3.5 w-3.5 ${div.iconColor}`} />
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm font-semibold leading-snug text-gray-800">
+                              {member.name}
+                            </p>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -527,10 +597,10 @@ export default function TentangPage() {
                         <User className="h-3 w-3" />
                         Anggota
                       </p>
-                      <ul className="space-y-2">
-                        {div.anggota.map((name, idx) => (
+                      <ul className="space-y-2.5">
+                        {div.anggota.map((member, idx) => (
                           <motion.li
-                            key={idx}
+                            key={member.id ?? idx}
                             className="flex items-center gap-2.5"
                             initial={{ opacity: 0, x: -8 }}
                             whileInView={{ opacity: 1, x: 0 }}
@@ -540,15 +610,26 @@ export default function TentangPage() {
                               duration: 0.35,
                             }}
                           >
-                            <span
-                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${div.iconBg}`}
+                            <div
+                              className={`relative h-7 w-7 shrink-0 overflow-hidden rounded-full ${!member.image_url ? div.iconBg : ''}`}
                             >
-                              <User
-                                className={`h-3 w-3 ${div.iconColor}`}
-                              />
-                            </span>
+                              {member.image_url ? (
+                                <Image
+                                  src={member.image_url}
+                                  alt={member.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <span className="flex h-full w-full items-center justify-center">
+                                  <User
+                                    className={`h-3.5 w-3.5 ${div.iconColor}`}
+                                  />
+                                </span>
+                              )}
+                            </div>
                             <span className="text-sm text-gray-600">
-                              {name}
+                              {member.name}
                             </span>
                           </motion.li>
                         ))}
@@ -559,6 +640,8 @@ export default function TentangPage() {
               );
             })}
           </motion.div>
+            </>
+          )}
         </div>
       </section>
     </>
