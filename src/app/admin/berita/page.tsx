@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Plus,
   Search,
@@ -9,69 +10,125 @@ import {
   Trash2,
   Newspaper,
   MoreVertical,
+  RefreshCw,
+  Eye,
+  CheckCircle2,
+  Clock,
+  Archive,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 /* ═══════════════════════════════════════════════
-   DUMMY DATA
+   TYPES
    ═══════════════════════════════════════════════ */
 
-const dummyBerita = [
-  {
-    id: 1,
-    title: "Pelantikan Pengurus TEKAD Periode 2025/2026 Resmi Digelar",
-    category: "Organisasi",
-    status: "published" as const,
-    date: "12 Apr 2025",
-    author: "Redaksi",
-  },
-  {
-    id: 2,
-    title: "Workshop Jurnalistik: Menulis Berita yang Berdampak",
-    category: "Akademik",
-    status: "draft" as const,
-    date: "28 Mar 2025",
-    author: "Andi P.",
-  },
-  {
-    id: 3,
-    title: "TEKAD Raih Juara 2 LKTI Tingkat Regional Sulawesi Selatan",
-    category: "Prestasi",
-    status: "published" as const,
-    date: "15 Mar 2025",
-    author: "Budi S.",
-  },
-  {
-    id: 4,
-    title: "Rapat Koordinasi Divisi Semester Genap 2025",
-    category: "Internal",
-    status: "archived" as const,
-    date: "10 Mar 2025",
-    author: "Admin",
-  },
-];
+interface Article {
+  id: string;
+  title: string;
+  slug?: string;
+  status: string;
+  is_featured: boolean;
+  thumbnail_url?: string | null;
+  created_at: string;
+  categories?: { name: string } | null;
+}
 
-const statusStyles = {
-  published: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
-  draft: "bg-gray-100 text-gray-600 ring-gray-500/10",
-  archived: "bg-amber-50 text-amber-700 ring-amber-600/10",
-};
-
-const statusLabel = {
-  published: "Published",
-  draft: "Draft",
-  archived: "Archived",
+const statusConfig: Record<
+  string,
+  { label: string; icon: typeof CheckCircle2; style: string }
+> = {
+  published: {
+    label: "Published",
+    icon: CheckCircle2,
+    style: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
+  },
+  draft: {
+    label: "Draft",
+    icon: Clock,
+    style: "bg-gray-100 text-gray-600 ring-gray-500/10",
+  },
+  archived: {
+    label: "Archived",
+    icon: Archive,
+    style: "bg-amber-50 text-amber-700 ring-amber-600/10",
+  },
 };
 
 /* ═══════════════════════════════════════════════
-   KELOLA BERITA PAGE
+   KELOLA BERITA PAGE — REAL DATA
    ═══════════════════════════════════════════════ */
 
 export default function AdminBeritaPage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  const filtered = dummyBerita.filter((b) =>
-    b.title.toLowerCase().includes(search.toLowerCase())
+  // Fetch articles from Supabase
+  const fetchArticles = async () => {
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("news_articles")
+        .select("*, categories(name)")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching articles:", error);
+      } else {
+        setArticles(data || []);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    const handleClick = () => setActiveMenu(null);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
+  // Filter
+  const filtered = articles.filter((a) =>
+    a.title.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Format date
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Delete article
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Hapus artikel "${title}"?`)) return;
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("news_articles")
+        .delete()
+        .eq("id", id);
+      if (error) {
+        alert(`Gagal menghapus: ${error.message}`);
+      } else {
+        setArticles((prev) => prev.filter((a) => a.id !== id));
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -94,16 +151,27 @@ export default function AdminBeritaPage() {
         </Link>
       </div>
 
-      {/* ── Search ── */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari artikel..."
-          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
-        />
+      {/* ── Search & Refresh ── */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari artikel..."
+            className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 transition-all placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+          />
+        </div>
+        <button
+          onClick={fetchArticles}
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-600 transition-all hover:bg-gray-50"
+        >
+          <RefreshCw
+            className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+          />
+          Refresh
+        </button>
       </div>
 
       {/* ── Table ── */}
@@ -130,91 +198,154 @@ export default function AdminBeritaPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map((item) => (
-                <tr
-                  key={item.id}
-                  className="group transition-colors duration-150 hover:bg-blue-50/40"
-                >
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50">
-                        <Newspaper className="h-4 w-4 text-blue-500" />
+              {loading ? (
+                /* Loading skeleton */
+                Array.from({ length: 4 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-lg bg-gray-200" />
+                        <div className="space-y-1.5">
+                          <div className="h-4 w-48 rounded bg-gray-200" />
+                          <div className="h-3 w-24 rounded bg-gray-100" />
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-gray-900 group-hover:text-blue-700">
-                          {item.title}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          oleh {item.author}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                      {item.category}
-                    </span>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${
-                        statusStyles[item.status]
-                      }`}
-                    >
-                      {statusLabel[item.status]}
-                    </span>
-                  </td>
-                  <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
-                    {item.date}
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-1">
-                      <button
-                        title="Edit"
-                        className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        title="Hapus"
-                        className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                      <button
-                        title="Lainnya"
-                        className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </button>
-                    </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-20 rounded bg-gray-100" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-6 w-20 rounded-full bg-gray-200" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-4 w-24 rounded bg-gray-100" />
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="h-8 w-24 rounded bg-gray-100" />
+                    </td>
+                  </tr>
+                ))
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-16 text-center">
+                    <Newspaper className="mx-auto mb-3 h-10 w-10 text-gray-300" />
+                    <p className="text-sm font-medium text-gray-400">
+                      {search
+                        ? "Tidak ada artikel yang cocok dengan pencarian."
+                        : "Belum ada artikel. Tulis berita pertama Anda!"}
+                    </p>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((item) => {
+                  const st = statusConfig[item.status] || statusConfig.draft;
+                  const StatusIcon = st.icon;
+                  return (
+                    <tr
+                      key={item.id}
+                      className="group transition-colors duration-150 hover:bg-blue-50/40"
+                    >
+                      {/* Title */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-blue-50">
+                            {item.thumbnail_url ? (
+                              <Image
+                                src={item.thumbnail_url}
+                                alt={item.title}
+                                fill
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center">
+                                <Newspaper className="h-4 w-4 text-blue-500" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-gray-900 group-hover:text-blue-700">
+                              {item.title}
+                            </p>
+                            {item.is_featured && (
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500">
+                                ★ Unggulan
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      {/* Category */}
+                      <td className="px-5 py-4">
+                        <span className="text-xs font-bold uppercase tracking-wider text-blue-500">
+                          {item.categories?.name || "Umum"}
+                        </span>
+                      </td>
+                      {/* Status */}
+                      <td className="px-5 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${st.style}`}
+                        >
+                          <StatusIcon className="h-3 w-3" />
+                          {st.label}
+                        </span>
+                      </td>
+                      {/* Date */}
+                      <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
+                        {formatDate(item.created_at)}
+                      </td>
+                      {/* Actions */}
+                      <td className="px-5 py-4">
+                        <div className="relative inline-block">
+                          <div className="flex items-center gap-1">
+                            <Link
+                              href={`/admin/berita/${item.id}`}
+                              title="Lihat"
+                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Link>
+                            <button
+                              title="Edit"
+                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                            <button
+                              title="Hapus"
+                              onClick={() =>
+                                handleDelete(item.id, item.title)
+                              }
+                              className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
 
         {/* Table footer */}
-        <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
-          <p className="text-xs text-gray-500">
-            Menampilkan {filtered.length} dari {dummyBerita.length} artikel
-          </p>
-          <div className="flex gap-1">
-            {[1, 2].map((p) => (
-              <button
-                key={p}
-                className={`h-8 w-8 rounded-lg text-xs font-semibold transition-colors ${
-                  p === 1
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                {p}
-              </button>
-            ))}
+        {!loading && filtered.length > 0 && (
+          <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
+            <p className="text-xs text-gray-500">
+              Menampilkan{" "}
+              <span className="font-semibold text-gray-700">
+                {filtered.length}
+              </span>{" "}
+              dari{" "}
+              <span className="font-semibold text-gray-700">
+                {articles.length}
+              </span>{" "}
+              artikel
+            </p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

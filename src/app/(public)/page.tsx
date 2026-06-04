@@ -33,8 +33,21 @@ interface Program {
   created_at?: string;
 }
 
+interface Article {
+  id: string;
+  title: string;
+  slug?: string;
+  content?: string;
+  excerpt?: string;
+  status: string;
+  is_featured: boolean;
+  thumbnail_url?: string | null;
+  created_at: string;
+  categories?: { name: string } | null;
+}
+
 /* ═══════════════════════════════════════════════
-   DUMMY DATA
+   STATIC DATA (non-berita)
    ═══════════════════════════════════════════════ */
 
 const heroSlides = [
@@ -64,42 +77,6 @@ const heroSlides = [
     category: "Prestasi",
     date: "15 Mar 2025",
     color: "from-slate-900/90 via-blue-900/80 to-indigo-900/90",
-  },
-];
-
-
-
-const featuredNews = {
-  id: 1,
-  title: "Pelantikan Pengurus TEKAD Periode 2025/2026 Resmi Digelar",
-  excerpt:
-    "Kepengurusan baru TEKAD UNM resmi dilantik di Aula Gedung PKM pada Sabtu, 12 April 2025. Acara dihadiri oleh seluruh anggota dan dosen pembimbing.",
-  category: "Organisasi",
-  categoryColor: "bg-blue-100 text-blue-700",
-  date: "12 Apr 2025",
-};
-
-const sideNews = [
-  {
-    id: 2,
-    title: "Workshop Jurnalistik: Menulis Berita yang Berdampak",
-    category: "Akademik",
-    categoryColor: "bg-emerald-100 text-emerald-700",
-    date: "28 Mar 2025",
-  },
-  {
-    id: 3,
-    title: "TEKAD Raih Juara 2 LKTI Tingkat Regional Sulawesi Selatan",
-    category: "Prestasi",
-    categoryColor: "bg-amber-100 text-amber-700",
-    date: "15 Mar 2025",
-  },
-  {
-    id: 4,
-    title: "Rapat Koordinasi Divisi Semester Genap 2025",
-    category: "Internal",
-    categoryColor: "bg-gray-100 text-gray-700",
-    date: "10 Mar 2025",
   },
 ];
 
@@ -147,6 +124,8 @@ export default function BerandaPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loadingPrograms, setLoadingPrograms] = useState(true);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loadingArticles, setLoadingArticles] = useState(true);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -185,6 +164,44 @@ export default function BerandaPage() {
     }
     fetchPrograms();
   }, []);
+
+  // Fetch published articles from Supabase
+  useEffect(() => {
+    async function fetchArticles() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("news_articles")
+          .select("*, categories(name)")
+          .eq("status", "published")
+          .order("created_at", { ascending: false })
+          .limit(4);
+
+        if (error) {
+          console.error("Error fetching articles:", error);
+        } else {
+          setArticles(data || []);
+        }
+      } catch (err) {
+        console.error("Error fetching articles:", err);
+      } finally {
+        setLoadingArticles(false);
+      }
+    }
+    fetchArticles();
+  }, []);
+
+  // Helper: format date
+  const formatDate = (dateStr: string) =>
+    new Date(dateStr).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+  // Split articles: first = featured, rest = side
+  const featuredArticle = articles[0] || null;
+  const sideArticles = articles.slice(1);
 
   return (
     <>
@@ -283,19 +300,24 @@ export default function BerandaPage() {
       </section>
 
 
-      {/* ─────────────── BERITA TERBARU (PORTAL STYLE) ─────────────── */}
+      {/* ─────────────── BERITA TERBARU (REAL DATA) ─────────────── */}
       <motion.section
         id="berita-terbaru"
         className="py-16 sm:py-20 md:py-28"
         {...sectionAnim}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
+          {/* Section Header — Pulsing dot design */}
           <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:mb-12 sm:flex-row sm:items-end">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700">
-                <Newspaper className="h-4 w-4" />
-                <span>Terbaru</span>
+              <div className="mb-3 flex items-center gap-3">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-600" />
+                </span>
+                <span className="text-sm font-bold uppercase tracking-widest text-blue-600">
+                  Terbaru
+                </span>
               </div>
               <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
                 Berita & Pengumuman
@@ -310,82 +332,137 @@ export default function BerandaPage() {
             </Link>
           </div>
 
-          {/* Grid: 1 featured left + 3 side right */}
-          <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-            {/* Featured article (big) */}
-            <article className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-900/5">
-              <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-blue-100 to-slate-200">
-                <div
-                  className="absolute inset-0 opacity-[0.06]"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle, #1e40af 1px, transparent 1px)",
-                    backgroundSize: "20px 20px",
-                  }}
-                />
-                <div className="flex h-full items-center justify-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm sm:h-20 sm:w-20">
-                    <Newspaper className="h-6 w-6 text-blue-400 sm:h-8 sm:w-8" />
-                  </div>
+          {/* Content */}
+          {loadingArticles ? (
+            /* Loading skeleton */
+            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+              <div className="animate-pulse rounded-2xl border border-gray-200/80 bg-white">
+                <div className="aspect-[16/9] rounded-t-2xl bg-gray-200" />
+                <div className="space-y-3 p-6">
+                  <div className="h-3 w-20 rounded bg-gray-200" />
+                  <div className="h-6 w-3/4 rounded bg-gray-200" />
+                  <div className="h-4 w-full rounded bg-gray-100" />
+                  <div className="h-4 w-2/3 rounded bg-gray-100" />
                 </div>
-                <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
-                  <span
-                    className={`rounded-lg px-3 py-1 text-xs font-semibold ${featuredNews.categoryColor}`}
-                  >
-                    {featuredNews.category}
-                  </span>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
-              <div className="p-5 sm:p-6 md:p-8">
-                <time className="mb-2 text-xs font-medium text-gray-400">
-                  {featuredNews.date}
-                </time>
-                <h3 className="mb-3 text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl md:text-2xl">
-                  {featuredNews.title}
-                </h3>
-                <p className="mb-5 text-sm leading-relaxed text-gray-500">
-                  {featuredNews.excerpt}
-                </p>
-                <Link
-                  href={`/berita/${featuredNews.id}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-800"
-                >
-                  Baca Selengkapnya
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+              <div className="flex flex-col gap-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="animate-pulse flex gap-4 rounded-xl border border-gray-200/80 bg-white p-4">
+                    <div className="h-20 w-24 shrink-0 rounded-lg bg-gray-200" />
+                    <div className="flex-1 space-y-2 py-1">
+                      <div className="h-3 w-16 rounded bg-gray-200" />
+                      <div className="h-4 w-full rounded bg-gray-200" />
+                      <div className="h-3 w-20 rounded bg-gray-100" />
+                    </div>
+                  </div>
+                ))}
               </div>
-            </article>
-
-            {/* Side news list */}
-            <div className="flex flex-col gap-4">
-              {sideNews.map((news) => (
-                <Link
-                  key={news.id}
-                  href={`/berita/${news.id}`}
-                  className="group flex gap-3 rounded-xl border border-gray-200/80 bg-white p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5 sm:gap-4 sm:p-4"
-                >
-                  {/* Mini thumbnail */}
-                  <div className="flex h-16 w-20 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 sm:h-20 sm:w-24">
-                    <Newspaper className="h-5 w-5 text-blue-300" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span
-                      className={`mb-1 inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${news.categoryColor}`}
-                    >
-                      {news.category}
-                    </span>
-                    <h4 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-700">
-                      {news.title}
-                    </h4>
-                    <time className="mt-1.5 text-xs text-gray-400">
-                      {news.date}
-                    </time>
-                  </div>
-                </Link>
-              ))}
             </div>
-          </div>
+          ) : articles.length === 0 ? (
+            /* Empty state */
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/50 p-10 text-center sm:p-16">
+              <Newspaper className="mx-auto mb-4 h-10 w-10 text-gray-300" />
+              <p className="text-sm font-medium text-gray-400">
+                Berita akan segera ditampilkan.
+              </p>
+            </div>
+          ) : (
+            /* Real data grid */
+            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+              {/* Featured article (big) */}
+              {featuredArticle && (
+                <Link href={`/berita/${featuredArticle.slug || featuredArticle.id}`}>
+                  <article className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-900/5">
+                    <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-blue-100 to-slate-200">
+                      {featuredArticle.thumbnail_url ? (
+                        <img
+                          src={featuredArticle.thumbnail_url}
+                          alt={featuredArticle.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      ) : (
+                        <>
+                          <div
+                            className="absolute inset-0 opacity-[0.06]"
+                            style={{
+                              backgroundImage:
+                                "radial-gradient(circle, #1e40af 1px, transparent 1px)",
+                              backgroundSize: "20px 20px",
+                            }}
+                          />
+                          <div className="flex h-full items-center justify-center">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm sm:h-20 sm:w-20">
+                              <Newspaper className="h-6 w-6 text-blue-400 sm:h-8 sm:w-8" />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
+                        <span className="text-xs font-black uppercase tracking-wider text-white drop-shadow-md">
+                          {featuredArticle.categories?.name || "UMUM"}
+                        </span>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                    </div>
+                    <div className="p-5 sm:p-6 md:p-8">
+                      <time className="mb-2 text-xs font-medium text-gray-400">
+                        {formatDate(featuredArticle.created_at)}
+                      </time>
+                      <h3 className="mb-3 text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl md:text-2xl">
+                        {featuredArticle.title}
+                      </h3>
+                      {featuredArticle.excerpt && (
+                        <p className="mb-5 line-clamp-3 text-sm leading-relaxed text-gray-500">
+                          {featuredArticle.excerpt}
+                        </p>
+                      )}
+                      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors group-hover:text-blue-800">
+                        Baca Selengkapnya
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </span>
+                    </div>
+                  </article>
+                </Link>
+              )}
+
+              {/* Side news list */}
+              <div className="flex flex-col gap-4">
+                {sideArticles.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/berita/${article.slug || article.id}`}
+                    className="group flex gap-3 rounded-xl border border-gray-200/80 bg-white p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5 sm:gap-4 sm:p-4"
+                  >
+                    {/* Mini thumbnail */}
+                    <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 sm:h-20 sm:w-24">
+                      {article.thumbnail_url ? (
+                        <img
+                          src={article.thumbnail_url}
+                          alt={article.title}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <Newspaper className="h-5 w-5 text-blue-300" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="mb-1 inline-block border-b-2 border-blue-500 pb-0.5 text-[10px] font-black uppercase tracking-wider text-blue-500">
+                        {article.categories?.name || "UMUM"}
+                      </span>
+                      <h4 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-700">
+                        {article.title}
+                      </h4>
+                      <time className="mt-1.5 text-xs text-gray-400">
+                        {formatDate(article.created_at)}
+                      </time>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.section>
 
