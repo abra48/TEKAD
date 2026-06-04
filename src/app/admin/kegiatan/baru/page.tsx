@@ -80,11 +80,6 @@ export default function KegiatanBaruPage() {
       // 1. Upload thumbnail jika ada
       if (thumbnailFile) {
         thumbnailUrl = await uploadFile(thumbnailFile, "events", "thumbnails");
-        if (!thumbnailUrl) {
-          setError("Gagal mengupload thumbnail. Silakan coba lagi.");
-          setIsLoading(false);
-          return;
-        }
       }
 
       // 2. Insert ke database
@@ -100,16 +95,17 @@ export default function KegiatanBaruPage() {
       });
 
       if (insertError) {
-        setError(`Gagal menyimpan kegiatan: ${insertError.message}`);
-        setIsLoading(false);
-        return;
+        throw new Error(insertError.message);
       }
 
       alert("Kegiatan berhasil ditambahkan!");
       router.push("/admin/kegiatan");
-    } catch (err) {
-      setError("Terjadi kesalahan yang tidak terduga.");
-      console.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      const message = err?.message || "Terjadi kesalahan yang tidak terduga.";
+      setError(`Gagal: ${message}`);
+      alert(`Gagal: ${message}`);
+      console.error("Submit error:", err);
     } finally {
       setIsLoading(false);
     }

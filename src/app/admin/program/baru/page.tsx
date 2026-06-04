@@ -77,11 +77,6 @@ export default function ProgramBaruPage() {
       // 1. Upload thumbnail jika ada
       if (imageFile) {
         imageUrl = await uploadFile(imageFile, "programs", "thumbnails");
-        if (!imageUrl) {
-          setError("Gagal mengupload gambar. Silakan coba lagi.");
-          setIsLoading(false);
-          return;
-        }
       }
 
       // 2. Insert ke database
@@ -94,16 +89,17 @@ export default function ProgramBaruPage() {
       });
 
       if (insertError) {
-        setError(`Gagal menyimpan program: ${insertError.message}`);
-        setIsLoading(false);
-        return;
+        throw new Error(insertError.message);
       }
 
       alert("Program berhasil ditambahkan!");
       router.push("/admin/program");
-    } catch (err) {
-      setError("Terjadi kesalahan yang tidak terduga.");
-      console.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      const message = err?.message || "Terjadi kesalahan yang tidak terduga.";
+      setError(`Gagal: ${message}`);
+      alert(`Gagal: ${message}`);
+      console.error("Submit error:", err);
     } finally {
       setIsLoading(false);
     }

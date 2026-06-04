@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -34,11 +34,6 @@ import { uploadFile } from "@/lib/supabase/storage";
    FORM EDITOR BERITA BARU
    ═══════════════════════════════════════════════ */
 
-interface Category {
-  id: string;
-  name: string;
-}
-
 const toolbarButtons = [
   { icon: Bold, label: "Bold" },
   { icon: Italic, label: "Italic" },
@@ -57,51 +52,42 @@ const toolbarButtons = [
   { icon: Code, label: "Code" },
 ];
 
-/** Buat slug sederhana dari judul artikel */
-function generateSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "") // hapus karakter spesial
-    .replace(/\s+/g, "-") // spasi → dash
-    .replace(/-+/g, "-") // hapus double dash
-    .substring(0, 120); // batasi panjang
-}
-
 export default function BeritaBaruPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ── State ──
+  // ── Form State ──
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [excerpt, setExcerpt] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState("draft");
-  const [featured, setFeatured] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Fetch categories from Supabase ──
+  // ── Categories fetched from Supabase ──
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [categories, setCategories] = useState<any[]>([]);
+
   useEffect(() => {
     async function fetchCategories() {
       try {
         const supabase = createClient();
         const { data, error } = await supabase
           .from("categories")
-          .select("id, name")
+          .select("*")
           .order("name", { ascending: true });
 
         if (error) {
-          console.error("Error fetching categories:", error);
+          console.error("Fetch categories error:", error);
         } else {
           setCategories(data || []);
         }
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        console.error("Unexpected error fetching categories:", err);
       }
     }
     fetchCategories();
@@ -128,10 +114,10 @@ export default function BeritaBaruPage() {
   };
 
   // ── Handle submit ──
-  const handleSubmit = async (e?: FormEvent) => {
-    e?.preventDefault();
+  const handleSubmit = async () => {
     setError(null);
 
+    // Validasi
     if (!title.trim()) {
       setError("Judul artikel tidak boleh kosong.");
       return;
@@ -149,41 +135,41 @@ export default function BeritaBaruPage() {
       // 1. Upload thumbnail jika ada
       if (thumbnailFile) {
         imageUrl = await uploadFile(thumbnailFile, "thumbnails", "news");
-        if (!imageUrl) {
-          setError("Gagal mengupload gambar thumbnail. Silakan coba lagi.");
-          setIsLoading(false);
-          return;
-        }
       }
 
-      // 2. Insert ke database
-      const supabase = createClient();
-      const slug = generateSlug(title);
+      // 2. Generate slug dari title
+      const slug = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
 
+      // 3. Insert ke database — WAJIB pakai category_id
+      const supabase = createClient();
       const { error: insertError } = await supabase
         .from("news_articles")
         .insert({
-          title,
-          slug,
-          content,
+          title: title,
+          slug: slug,
+          content: content,
           excerpt: excerpt || null,
           category_id: categoryId || null,
-          status,
-          is_featured: featured,
+          status: status,
+          is_featured: isFeatured,
           thumbnail_url: imageUrl,
         });
 
       if (insertError) {
-        setError(`Gagal menyimpan artikel: ${insertError.message}`);
-        setIsLoading(false);
-        return;
+        throw new Error(insertError.message);
       }
 
       alert("Berita berhasil disimpan!");
       router.push("/admin/berita");
-    } catch (err) {
-      setError("Terjadi kesalahan yang tidak terduga.");
-      console.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      const message = err?.message || "Terjadi kesalahan yang tidak terduga.";
+      setError(`Gagal: ${message}`);
+      alert(`Gagal: ${message}`);
+      console.error("Submit error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -216,7 +202,7 @@ export default function BeritaBaruPage() {
             Preview
           </button>
           <button
-            onClick={() => handleSubmit()}
+            onClick={handleSubmit}
             disabled={isLoading}
             className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
           >
@@ -266,7 +252,7 @@ export default function BeritaBaruPage() {
             </div>
           </div>
 
-          {/* Rich Text Editor (Mock) */}
+          {/* Rich Text Editor (Mock Toolbar) */}
           <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-0.5 border-b border-gray-100 px-3 py-2">
@@ -295,7 +281,7 @@ export default function BeritaBaruPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={18}
-                placeholder={`Mulai menulis isi artikel di sini...\n\nTips: Gunakan toolbar di atas untuk memformat teks Anda. Anda bisa menambahkan heading, list, gambar, dan link.`}
+                placeholder={`Mulai menulis isi artikel di sini...\n\nTips: Gunakan toolbar di atas untuk memformat teks Anda.`}
                 className="w-full resize-none border-0 bg-transparent text-base leading-relaxed text-gray-700 placeholder:text-gray-300 focus:outline-none focus:ring-0"
               />
             </div>
@@ -321,7 +307,7 @@ export default function BeritaBaruPage() {
                 value={excerpt}
                 onChange={(e) => setExcerpt(e.target.value)}
                 rows={3}
-                placeholder="Tulis ringkasan singkat artikel (opsional, ditampilkan di halaman daftar berita)..."
+                placeholder="Tulis ringkasan singkat artikel (opsional)..."
                 className="w-full resize-none border-0 bg-transparent text-sm leading-relaxed text-gray-700 placeholder:text-gray-300 focus:outline-none focus:ring-0"
               />
             </div>
@@ -381,7 +367,7 @@ export default function BeritaBaruPage() {
             </div>
           </div>
 
-          {/* Kategori — fetched from Supabase */}
+          {/* Kategori — fetched from Supabase categories table */}
           <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white">
             <div className="border-b border-gray-100 px-5 py-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -395,15 +381,15 @@ export default function BeritaBaruPage() {
                 className="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
               >
                 <option value="">— Pilih Kategori —</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
               {categories.length === 0 && (
-                <p className="mt-2 text-xs text-gray-400">
-                  Memuat kategori...
+                <p className="mt-2 text-xs text-amber-600">
+                  ⚠ Belum ada kategori. Tambahkan di tabel &quot;categories&quot; Supabase.
                 </p>
               )}
             </div>
@@ -416,7 +402,7 @@ export default function BeritaBaruPage() {
                 <div className="flex items-center gap-3">
                   <div
                     className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
-                      featured
+                      isFeatured
                         ? "bg-amber-100 text-amber-600"
                         : "bg-gray-100 text-gray-400"
                     }`}
@@ -435,8 +421,8 @@ export default function BeritaBaruPage() {
                 <div className="relative">
                   <input
                     type="checkbox"
-                    checked={featured}
-                    onChange={(e) => setFeatured(e.target.checked)}
+                    checked={isFeatured}
+                    onChange={(e) => setIsFeatured(e.target.checked)}
                     className="peer sr-only"
                   />
                   <div className="h-6 w-11 rounded-full bg-gray-200 transition-colors peer-checked:bg-blue-600" />
@@ -465,7 +451,7 @@ export default function BeritaBaruPage() {
 
               <button
                 type="button"
-                onClick={() => handleSubmit()}
+                onClick={handleSubmit}
                 disabled={isLoading}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all hover:bg-blue-700 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
               >

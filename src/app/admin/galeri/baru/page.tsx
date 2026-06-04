@@ -72,11 +72,6 @@ export default function GaleriBaruPage() {
     try {
       // 1. Upload gambar ke Supabase Storage
       const imageUrl = await uploadFile(imageFile, "gallery", "photos");
-      if (!imageUrl) {
-        setError("Gagal mengupload foto. Silakan coba lagi.");
-        setIsLoading(false);
-        return;
-      }
 
       // 2. Insert ke database
       const supabase = createClient();
@@ -88,16 +83,17 @@ export default function GaleriBaruPage() {
       });
 
       if (insertError) {
-        setError(`Gagal menyimpan data galeri: ${insertError.message}`);
-        setIsLoading(false);
-        return;
+        throw new Error(insertError.message);
       }
 
       alert("Foto berhasil diupload!");
       router.push("/admin/galeri");
-    } catch (err) {
-      setError("Terjadi kesalahan yang tidak terduga.");
-      console.error(err);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      const message = err?.message || "Terjadi kesalahan yang tidak terduga.";
+      setError(`Gagal: ${message}`);
+      alert(`Gagal: ${message}`);
+      console.error("Submit error:", err);
     } finally {
       setIsLoading(false);
     }
