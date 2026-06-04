@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, Eye, EyeOff, Sparkles, AlertCircle } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
@@ -42,55 +42,51 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-100 via-slate-50 to-blue-50 px-4 py-12">
-      {/* Background decoration */}
+    <div className="admin-dark relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4 py-12">
+      {/* Background effects */}
       <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -left-40 -top-40 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-blue-100/40 to-sky-200/20 blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 h-[400px] w-[400px] rounded-full bg-gradient-to-tr from-indigo-100/30 to-blue-100/20 blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage:
-              "linear-gradient(#1e40af 1px, transparent 1px), linear-gradient(to right, #1e40af 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
-        />
+        {/* Gradient orbs */}
+        <div className="absolute -left-40 -top-40 h-[600px] w-[600px] rounded-full bg-blue-600/[0.07] blur-[120px]" />
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-indigo-600/[0.05] blur-[120px]" />
+        {/* Dot grid */}
+        <div className="absolute inset-0 dot-grid opacity-30" />
       </div>
 
       {/* Login Card */}
-      <div className="relative w-full max-w-md">
-        {/* Logo top */}
-        <div className="mb-8 text-center">
-          <div className="relative mx-auto mb-4 h-16 w-16 overflow-hidden rounded-2xl shadow-xl shadow-blue-600/25">
+      <div className="relative z-10 w-full max-w-[400px]">
+        {/* Logo */}
+        <div className="mb-10 text-center">
+          <div className="relative mx-auto mb-5 h-14 w-14 overflow-hidden rounded-2xl shadow-glow-md ring-1 ring-white/10">
             <Image
               src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
               alt="Logo TEKAD"
               fill
               className="object-cover"
-              sizes="64px"
+              sizes="56px"
             />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">
-            Login Admin <span className="text-blue-700">TEKAD</span>
+          <h1 className="text-2xl font-extrabold tracking-tight text-white">
+            Admin Panel
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Masuk ke panel administrasi TEKAD UNM
+          <p className="mt-2 text-sm text-slate-500">
+            Masuk ke dashboard TEKAD UNM
           </p>
         </div>
 
-        {/* Form card */}
+        {/* Form — glass card */}
         <form
           onSubmit={handleSubmit}
-          className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-xl shadow-gray-900/5"
+          className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02] shadow-2xl shadow-black/20 backdrop-blur-xl"
         >
-          <div className="h-1.5 bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400" />
+          {/* Top accent */}
+          <div className="h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
 
           <div className="p-7 sm:p-8">
             {/* Error message */}
             {error && (
-              <div className="mb-5 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
-                <p className="text-sm font-medium text-red-700">{error}</p>
+              <div className="mb-6 flex items-start gap-2.5 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-4 py-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                <p className="text-sm font-medium text-red-300">{error}</p>
               </div>
             )}
 
@@ -98,9 +94,9 @@ export default function AdminLoginPage() {
             <div className="mb-5">
               <label
                 htmlFor="email"
-                className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-gray-700"
+                className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500"
               >
-                <Mail className="h-3.5 w-3.5 text-gray-400" />
+                <Mail className="h-3 w-3" />
                 Email
               </label>
               <input
@@ -110,17 +106,17 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@tekad.unm.ac.id"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                className="admin-input w-full rounded-xl px-4 py-3 text-sm"
               />
             </div>
 
             {/* Password */}
-            <div className="mb-6">
+            <div className="mb-7">
               <label
                 htmlFor="password"
-                className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-gray-700"
+                className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500"
               >
-                <Lock className="h-3.5 w-3.5 text-gray-400" />
+                <Lock className="h-3 w-3" />
                 Password
               </label>
               <div className="relative">
@@ -131,12 +127,12 @@ export default function AdminLoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 pr-11 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10"
+                  className="admin-input w-full rounded-xl px-4 py-3 pr-11 text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 transition-colors hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-600 transition-colors hover:text-slate-400"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -151,7 +147,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group flex w-full items-center justify-center gap-2.5 rounded-xl bg-blue-600 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all duration-200 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
+              className="group flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:shadow-xl hover:shadow-blue-600/30 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? (
                 <>
@@ -169,9 +165,10 @@ export default function AdminLoginPage() {
         </form>
 
         {/* Footer */}
-        <div className="mt-6 flex items-center justify-center gap-1.5 text-xs text-gray-400">
-          <Sparkles className="h-3 w-3" />
-          <span>TEKAD UNM — Panel Admin</span>
+        <div className="mt-8 text-center">
+          <p className="text-[11px] text-slate-600">
+            TEKAD UNM — Panel Administrasi
+          </p>
         </div>
       </div>
     </div>

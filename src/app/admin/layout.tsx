@@ -18,6 +18,7 @@ import {
   Bell,
   BookOpen,
   Users,
+  Sparkles,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════
@@ -36,7 +37,7 @@ const sidebarLinks = [
 ];
 
 /* ═══════════════════════════════════════════════
-   ADMIN LAYOUT
+   ADMIN LAYOUT — DARK PREMIUM
    ═══════════════════════════════════════════════ */
 
 export default function AdminLayout({
@@ -75,7 +76,7 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50/80">
+    <div className="admin-dark flex min-h-screen bg-surface">
       {/* ── Mobile Overlay ── */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -84,7 +85,7 @@ export default function AdminLayout({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -92,47 +93,55 @@ export default function AdminLayout({
 
       {/* ── SIDEBAR ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[272px] flex-col border-r border-gray-200/80 bg-white transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[260px] flex-col bg-surface-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
+        {/* Subtle right border glow */}
+        <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-transparent via-blue-500/20 to-transparent" />
+
         {/* Sidebar Header / Logo */}
-        <div className="flex h-16 items-center justify-between border-b border-gray-100 px-5">
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <img
-              src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
-              alt="Logo TEKAD"
-              className="h-9 w-auto"
-            />
+        <div className="flex h-16 items-center justify-between px-5">
+          <Link href="/admin" className="flex items-center gap-3">
+            <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl">
+              <img
+                src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
+                alt="Logo TEKAD"
+                className="h-9 w-auto"
+              />
+            </div>
             <div className="flex flex-col leading-none">
-              <span className="text-sm font-bold tracking-tight text-gray-900">
-                TEKAD Admin
+              <span className="text-sm font-bold tracking-tight text-white">
+                TEKAD
               </span>
-              <span className="text-[9px] font-semibold tracking-[0.15em] text-blue-600">
-                PANEL
+              <span className="text-[9px] font-semibold tracking-[0.2em] text-blue-400/80">
+                ADMIN PANEL
               </span>
             </div>
           </Link>
           {/* Close button (mobile) */}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 lg:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300 lg:hidden"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Admin Profile */}
-        <div className="border-b border-gray-100 px-5 py-4">
+        {/* Admin Profile — glass card */}
+        <div className="mx-3 mt-2 rounded-xl border border-white/[0.04] bg-white/[0.02] p-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-sm font-bold text-white shadow-sm">
-              A
+            <div className="relative">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-bold text-white ring-2 ring-blue-500/20">
+                A
+              </div>
+              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-surface-50 bg-emerald-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-gray-900">
+              <p className="truncate text-xs font-semibold text-slate-200">
                 Admin TEKAD
               </p>
-              <p className="truncate text-xs text-gray-500">
+              <p className="truncate text-[10px] text-slate-500">
                 admin@tekad.unm.ac.id
               </p>
             </div>
@@ -140,11 +149,11 @@ export default function AdminLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-gray-400">
-            Menu Utama
+        <nav className="dark-scroll mt-6 flex-1 overflow-y-auto px-3">
+          <p className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">
+            Menu
           </p>
-          <ul className="space-y-1">
+          <ul className="space-y-0.5">
             {sidebarLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -152,22 +161,26 @@ export default function AdminLayout({
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
                       active
-                        ? "bg-blue-50 text-blue-700 shadow-sm shadow-blue-100"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        ? "bg-blue-500/10 text-blue-400"
+                        : "text-slate-400 hover:bg-white/[0.03] hover:text-slate-200"
                     }`}
                   >
+                    {/* Active indicator bar */}
+                    {active && (
+                      <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-blue-500" />
+                    )}
                     <Icon
-                      className={`h-[18px] w-[18px] shrink-0 ${
+                      className={`h-[17px] w-[17px] shrink-0 ${
                         active
-                          ? "text-blue-600"
-                          : "text-gray-400 group-hover:text-gray-600"
+                          ? "text-blue-400"
+                          : "text-slate-500 group-hover:text-slate-300"
                       }`}
                     />
                     <span className="flex-1">{link.label}</span>
                     {active && (
-                      <ChevronRight className="h-4 w-4 text-blue-400" />
+                      <ChevronRight className="h-3.5 w-3.5 text-blue-500/60" />
                     )}
                   </Link>
                 </li>
@@ -177,64 +190,64 @@ export default function AdminLayout({
         </nav>
 
         {/* Logout */}
-        <div className="border-t border-gray-100 p-3">
+        <div className="border-t border-white/[0.04] p-3">
           <Link
             href="/admin/login"
-            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600"
+            className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-medium text-slate-500 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400"
           >
-            <LogOut className="h-[18px] w-[18px]" />
+            <LogOut className="h-[17px] w-[17px]" />
             <span>Logout</span>
           </Link>
         </div>
       </aside>
 
       {/* ── MAIN CONTENT ── */}
-      <div className="flex flex-1 flex-col lg:pl-[272px]">
-        {/* Topbar */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200/80 bg-white/90 px-4 backdrop-blur-md sm:px-6">
+      <div className="flex flex-1 flex-col lg:pl-[260px]">
+        {/* Topbar — glass */}
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-white/[0.04] bg-surface/80 px-4 backdrop-blur-xl sm:px-6">
           {/* Hamburger (mobile) */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 lg:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300 lg:hidden"
             aria-label="Buka menu"
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          {/* Breadcrumb / Page indicator */}
-          <div className="hidden items-center gap-2 text-sm lg:flex">
+          {/* Breadcrumb */}
+          <div className="hidden items-center gap-2 text-xs lg:flex">
             <Link
               href="/admin"
-              className="font-medium text-gray-400 transition-colors hover:text-blue-600"
+              className="font-medium text-slate-600 transition-colors hover:text-blue-400"
             >
               Admin
             </Link>
-            <ChevronRight className="h-3.5 w-3.5 text-gray-300" />
-            <span className="font-semibold text-gray-700">
+            <ChevronRight className="h-3 w-3 text-slate-700" />
+            <span className="font-semibold text-slate-300">
               {sidebarLinks.find((l) => isActive(l.href))?.label || "Dashboard"}
             </span>
           </div>
 
           {/* Right side */}
-          <div className="flex items-center gap-2">
-            {/* Notification bell */}
-            <button className="relative flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-2 top-2 flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-600" />
-              </span>
+          <div className="flex items-center gap-1.5">
+            {/* Notification */}
+            <button className="relative flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300">
+              <Bell className="h-[18px] w-[18px]" />
+              <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-blue-500 ring-2 ring-surface" />
             </button>
 
+            {/* Divider */}
+            <div className="mx-1.5 h-6 w-px bg-white/[0.06]" />
+
             {/* Avatar */}
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-xs font-bold text-white shadow-sm">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-[10px] font-bold text-white">
               A
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-5 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

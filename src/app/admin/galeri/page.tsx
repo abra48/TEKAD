@@ -1,170 +1,154 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Plus,
-  Pencil,
   Trash2,
   Camera,
   Star,
+  Loader2,
 } from "lucide-react";
-
-/* ═══════════════════════════════════════════════
-   DUMMY DATA
-   ═══════════════════════════════════════════════ */
-
-const dummyGaleri = [
-  {
-    id: 1,
-    title: "Pelantikan Pengurus 2025/2026",
-    kegiatan: "Organisasi",
-    is_featured: true,
-    date: "12 Apr 2025",
-    color: "from-blue-200 to-blue-300",
-  },
-  {
-    id: 2,
-    title: "Workshop Jurnalistik Digital",
-    kegiatan: "Pelatihan",
-    is_featured: false,
-    date: "28 Mar 2025",
-    color: "from-sky-200 to-indigo-300",
-  },
-  {
-    id: 3,
-    title: "Kunjungan Redaksi Media Nasional",
-    kegiatan: "Studi Lapangan",
-    is_featured: true,
-    date: "15 Mar 2025",
-    color: "from-indigo-200 to-blue-300",
-  },
-  {
-    id: 4,
-    title: "Bakti Sosial Kampus",
-    kegiatan: "Pengabdian",
-    is_featured: false,
-    date: "1 Mar 2025",
-    color: "from-slate-200 to-gray-300",
-  },
-  {
-    id: 5,
-    title: "Lomba Karya Tulis Ilmiah",
-    kegiatan: "Kompetisi",
-    is_featured: false,
-    date: "20 Feb 2025",
-    color: "from-blue-200 to-slate-300",
-  },
-  {
-    id: 6,
-    title: "Rapat Kerja Tahunan TEKAD",
-    kegiatan: "Internal",
-    is_featured: false,
-    date: "10 Feb 2025",
-    color: "from-gray-200 to-blue-200",
-  },
-];
-
-/* ═══════════════════════════════════════════════
-   KELOLA GALERI PAGE
-   ═══════════════════════════════════════════════ */
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminGaleriPage() {
+  const [galeri, setGaleri] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchGaleri() {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("gallery")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) console.error("Fetch gallery error:", error);
+      setGaleri(data ?? []);
+      setIsLoading(false);
+    }
+    fetchGaleri();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Yakin ingin menghapus foto ini?")) return;
+    const supabase = createClient();
+    const { error } = await supabase.from("gallery").delete().eq("id", id);
+    if (error) {
+      alert(`Gagal menghapus: ${error.message}`);
+      return;
+    }
+    setGaleri((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-3">
+        <Loader2 className="h-7 w-7 animate-spin text-blue-400" />
+        <p className="text-sm text-slate-500">Memuat galeri...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {/* ── Header ── */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900">
-            Manajemen Galeri Kegiatan
+          <h1 className="text-2xl font-extrabold tracking-tight text-white">
+            Galeri Kegiatan
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Upload, edit, dan kelola foto dokumentasi kegiatan
+          <p className="mt-1 text-sm text-slate-500">
+            {galeri.length} foto dokumentasi kegiatan
           </p>
         </div>
         <Link
           href="/admin/galeri/baru"
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-lg active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:shadow-xl active:scale-[0.98]"
         >
           <Plus className="h-4 w-4" />
           Upload Foto
         </Link>
       </div>
 
-      {/* ── Grid View ── */}
-      <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
-        {dummyGaleri.map((foto) => (
-          <div
-            key={foto.id}
-            className="group overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gray-900/5"
-          >
-            {/* Image placeholder */}
-            <div
-              className={`relative aspect-[4/3] bg-gradient-to-br ${foto.color}`}
-            >
-              {/* Pattern */}
-              <div
-                className="absolute inset-0 opacity-[0.05]"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(circle, #1e40af 1px, transparent 1px)",
-                  backgroundSize: "14px 14px",
-                }}
-              />
-              {/* Center icon */}
-              <div className="flex h-full items-center justify-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/70 shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:scale-110">
-                  <Camera className="h-5 w-5 text-blue-500" />
-                </div>
-              </div>
-
-              {/* Featured badge */}
-              {foto.is_featured && (
-                <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-lg bg-amber-400 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
-                  <Star className="h-3 w-3" />
-                  Featured
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="p-4">
-              <p className="truncate text-sm font-semibold text-gray-900 group-hover:text-blue-700">
-                {foto.title}
-              </p>
-              <div className="mt-1.5 flex items-center justify-between">
-                <span className="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-500">
-                  {foto.kegiatan}
-                </span>
-                <span className="text-xs text-gray-400">{foto.date}</span>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-3 flex items-center gap-1.5 border-t border-gray-100 pt-3">
-                <button className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600">
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit
-                </button>
-                <div className="h-5 w-px bg-gray-100" />
-                <button className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-medium text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600">
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Hapus
-                </button>
-              </div>
-            </div>
+      {/* Content */}
+      {galeri.length === 0 ? (
+        <div className="flex min-h-[300px] flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.01]">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/[0.03]">
+            <Camera className="h-6 w-6 text-slate-600" />
           </div>
-        ))}
-      </div>
+          <div className="text-center">
+            <p className="text-sm font-medium text-slate-400">Belum ada foto</p>
+            <Link href="/admin/galeri/baru" className="mt-1 text-xs font-semibold text-blue-400 hover:text-blue-300">
+              Upload foto pertama →
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {galeri.map((foto) => (
+            <div
+              key={foto.id}
+              className="group overflow-hidden rounded-2xl border border-white/[0.04] bg-white/[0.02] transition-all duration-300 hover:border-white/[0.08] hover:bg-white/[0.04]"
+            >
+              {/* Image */}
+              <div className="relative aspect-[4/3] overflow-hidden bg-surface-200">
+                {foto.image_url ? (
+                  <Image
+                    src={foto.image_url}
+                    alt={foto.title || "Foto galeri"}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  />
+                ) : (
+                  <div className="flex h-full items-center justify-center">
+                    <Camera className="h-6 w-6 text-slate-700" />
+                  </div>
+                )}
 
-      {/* ── Footer info ── */}
-      <div className="flex items-center justify-between text-xs text-gray-400">
-        <span>
-          Menampilkan {dummyGaleri.length} foto •{" "}
-          {dummyGaleri.filter((f) => f.is_featured).length} featured
-        </span>
-        <button className="font-semibold text-blue-600 transition-colors hover:text-blue-800">
-          Muat Lebih Banyak →
-        </button>
-      </div>
+                {/* Featured badge */}
+                {foto.is_featured && (
+                  <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-lg bg-amber-500/90 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+                    <Star className="h-2.5 w-2.5" />
+                    Featured
+                  </div>
+                )}
+
+                {/* Delete overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+                  <button
+                    onClick={() => handleDelete(foto.id)}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/80 text-white transition-transform hover:scale-110"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="p-4">
+                <p className="truncate text-sm font-semibold text-slate-200">
+                  {foto.title}
+                </p>
+                <p className="mt-1 text-[11px] text-slate-600">
+                  {formatDate(foto.created_at)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

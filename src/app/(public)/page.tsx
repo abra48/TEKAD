@@ -47,57 +47,40 @@ interface Article {
 }
 
 /* ═══════════════════════════════════════════════
-   STATIC DATA (non-berita)
+   STATIC DATA
    ═══════════════════════════════════════════════ */
 
 const heroSlides = [
   {
     id: 1,
     title: "Pelantikan Pengurus TEKAD Periode 2025/2026 Resmi Digelar",
-    excerpt:
-      "Kepengurusan baru TEKAD UNM resmi dilantik di Aula Gedung PKM pada Sabtu, 12 April 2025.",
+    excerpt: "Kepengurusan baru TEKAD UNM resmi dilantik di Aula Gedung PKM pada Sabtu, 12 April 2025.",
     category: "Organisasi",
     date: "12 Apr 2025",
-    color: "from-blue-900/90 via-blue-800/80 to-slate-900/90",
   },
   {
     id: 2,
     title: "Workshop Jurnalistik: Menulis Berita yang Berdampak",
-    excerpt:
-      "TEKAD UNM mengadakan workshop jurnalistik bersama praktisi media nasional.",
+    excerpt: "TEKAD UNM mengadakan workshop jurnalistik bersama praktisi media nasional.",
     category: "Akademik",
     date: "28 Mar 2025",
-    color: "from-indigo-900/90 via-blue-900/80 to-slate-900/90",
   },
   {
     id: 3,
     title: "TEKAD Raih Juara 2 Lomba Karya Tulis Ilmiah Tingkat Regional",
-    excerpt:
-      "Tim perwakilan TEKAD berhasil meraih Juara 2 LKTI tingkat regional Sulawesi Selatan.",
+    excerpt: "Tim perwakilan TEKAD berhasil meraih Juara 2 LKTI tingkat regional Sulawesi Selatan.",
     category: "Prestasi",
     date: "15 Mar 2025",
-    color: "from-slate-900/90 via-blue-900/80 to-indigo-900/90",
   },
 ];
 
 const divisiData = [
-  { icon: Monitor, name: "Website", desc: "Pengembangan & pengelolaan web", color: "from-blue-500 to-blue-700" },
-  { icon: AtSign, name: "Instagram", desc: "Konten & desain visual IG", color: "from-pink-500 to-rose-600" },
-  { icon: Film, name: "TikTok", desc: "Konten video pendek kreatif", color: "from-slate-700 to-slate-900" },
-  { icon: Globe, name: "YouTube", desc: "Produksi video & dokumentasi", color: "from-red-500 to-red-700" },
-  { icon: PenLine, name: "Reporter", desc: "Liputan berita & jurnalistik", color: "from-indigo-500 to-indigo-700" },
+  { icon: Monitor, name: "Website", desc: "Pengembangan & pengelolaan web" },
+  { icon: AtSign, name: "Instagram", desc: "Konten & desain visual IG" },
+  { icon: Film, name: "TikTok", desc: "Konten video pendek kreatif" },
+  { icon: Globe, name: "YouTube", desc: "Produksi video & dokumentasi" },
+  { icon: PenLine, name: "Reporter", desc: "Liputan berita & jurnalistik" },
 ];
-
-const galleryImages = [
-  { id: 1, alt: "Pelantikan Pengurus Baru", color: "from-blue-200 to-blue-300" },
-  { id: 2, alt: "Workshop Jurnalistik", color: "from-sky-200 to-indigo-300" },
-  { id: 3, alt: "Kegiatan Sosial", color: "from-indigo-200 to-blue-300" },
-  { id: 4, alt: "Lomba Karya Tulis", color: "from-slate-200 to-blue-200" },
-];
-
-/* ═══════════════════════════════════════════════
-   ANIMATION PRESETS
-   ═══════════════════════════════════════════════ */
 
 const sectionAnim = {
   initial: { opacity: 0, y: 30 },
@@ -106,18 +89,17 @@ const sectionAnim = {
   transition: { duration: 0.6, ease: "easeOut" as const },
 };
 
-/* Program card accent colors */
 const programColors = [
-  "from-blue-500 to-blue-700",
-  "from-indigo-500 to-indigo-700",
+  "from-blue-500 to-blue-600",
+  "from-indigo-500 to-indigo-600",
   "from-sky-500 to-blue-600",
-  "from-violet-500 to-purple-700",
-  "from-teal-500 to-cyan-700",
+  "from-violet-500 to-purple-600",
+  "from-teal-500 to-cyan-600",
   "from-blue-600 to-indigo-600",
 ];
 
 /* ═══════════════════════════════════════════════
-   BERANDA PAGE
+   BERANDA PAGE — CLEAN PREMIUM
    ═══════════════════════════════════════════════ */
 
 export default function BerandaPage() {
@@ -135,27 +117,19 @@ export default function BerandaPage() {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
-  // Auto-play
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  // Fetch programs from Supabase
+  // Fetch programs
   useEffect(() => {
     async function fetchPrograms() {
       try {
         const supabase = createClient();
-        const { data, error } = await supabase
-          .from("programs")
-          .select("*")
-          .eq("is_active", true);
-
-        if (error) {
-          console.error("Error fetching programs:", error);
-        } else {
-          setPrograms(data || []);
-        }
+        const { data, error } = await supabase.from("programs").select("*").eq("is_active", true);
+        if (error) console.error("Error fetching programs:", error);
+        else setPrograms(data || []);
       } catch (err) {
         console.error("Error fetching programs:", err);
       } finally {
@@ -165,7 +139,7 @@ export default function BerandaPage() {
     fetchPrograms();
   }, []);
 
-  // Fetch published articles from Supabase
+  // Fetch articles
   useEffect(() => {
     async function fetchArticles() {
       try {
@@ -176,12 +150,8 @@ export default function BerandaPage() {
           .eq("status", "published")
           .order("created_at", { ascending: false })
           .limit(4);
-
-        if (error) {
-          console.error("Error fetching articles:", error);
-        } else {
-          setArticles(data || []);
-        }
+        if (error) console.error("Error fetching articles:", error);
+        else setArticles(data || []);
       } catch (err) {
         console.error("Error fetching articles:", err);
       } finally {
@@ -191,73 +161,50 @@ export default function BerandaPage() {
     fetchArticles();
   }, []);
 
-  // Helper: format date
   const formatDate = (dateStr: string) =>
-    new Date(dateStr).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+    new Date(dateStr).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
 
-  // Split articles: first = featured, rest = side
   const featuredArticle = articles[0] || null;
   const sideArticles = articles.slice(1);
 
   return (
     <>
-      {/* ─────────────── HERO SLIDER ─────────────── */}
-      <section id="hero" className="relative overflow-hidden bg-gray-900">
-        {/* Slides */}
-        <div className="relative h-[340px] sm:h-[420px] md:h-[480px] lg:h-[540px]">
+      {/* ─────────────── HERO ─────────────── */}
+      <section id="hero" className="relative overflow-hidden bg-gray-950">
+        <div className="relative h-[380px] sm:h-[440px] md:h-[500px] lg:h-[560px]">
           {heroSlides.map((slide, index) => (
             <div
               key={slide.id}
               className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-                index === currentSlide
-                  ? "translate-x-0 opacity-100"
-                  : index < currentSlide
-                  ? "-translate-x-full opacity-0"
-                  : "translate-x-full opacity-0"
+                index === currentSlide ? "translate-x-0 opacity-100" : index < currentSlide ? "-translate-x-full opacity-0" : "translate-x-full opacity-0"
               }`}
             >
-              {/* Background gradient */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-r ${slide.color}`}
-              />
-              {/* Dot pattern */}
-              <div
-                className="absolute inset-0 opacity-[0.04]"
-                style={{
-                  backgroundImage:
-                    "radial-gradient(circle, #fff 1px, transparent 1px)",
-                  backgroundSize: "30px 30px",
-                }}
-              />
+              {/* BG */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-blue-950/80 to-gray-950" />
+              <div className="absolute inset-0 dot-grid opacity-20" />
 
               {/* Content */}
               <div className="relative flex h-full items-center">
-                <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 md:px-12 lg:px-8">
-                  <div className="max-w-xl lg:max-w-2xl">
-                    <span className="mb-3 inline-block rounded-md bg-blue-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 backdrop-blur-sm sm:mb-4 sm:px-3 sm:text-xs">
+                <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-8">
+                  <div className="max-w-2xl">
+                    <span className="mb-4 inline-block rounded-full bg-blue-500/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-blue-400 backdrop-blur-sm sm:text-xs">
                       {slide.category}
                     </span>
-                    <h2 className="text-xl font-extrabold leading-tight tracking-tight text-white sm:text-2xl md:text-3xl lg:text-5xl">
+                    <h2 className="text-2xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
                       {slide.title}
                     </h2>
-                    <p className="mt-3 max-w-md text-xs leading-relaxed text-gray-300 sm:mt-4 sm:max-w-lg sm:text-sm md:text-base">
+                    <p className="mt-4 max-w-lg text-sm leading-relaxed text-gray-400 sm:text-base">
                       {slide.excerpt}
                     </p>
-                    <div className="mt-4 flex flex-col items-start gap-2 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
+                    <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                       <Link
                         href={`/berita/${slide.id}`}
-                        className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-[0.98] sm:px-6 sm:py-3 sm:text-sm"
+                        className="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-gray-900 transition-all hover:bg-gray-100 active:scale-[0.98] sm:px-6"
                       >
                         Baca Selengkapnya
-                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                       </Link>
-                      <span className="text-xs text-gray-400 sm:text-sm">
-                        {slide.date}
-                      </span>
+                      <span className="text-xs text-gray-600">{slide.date}</span>
                     </div>
                   </div>
                 </div>
@@ -265,33 +212,19 @@ export default function BerandaPage() {
             </div>
           ))}
 
-          {/* Navigation arrows — small & transparent on mobile */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/5 text-white/60 transition-all hover:bg-white/20 hover:text-white sm:left-4 sm:h-9 sm:w-9 md:left-6 md:h-10 md:w-10"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+          {/* Nav arrows */}
+          <button onClick={prevSlide} className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/5 text-white/50 backdrop-blur-sm transition hover:bg-white/10 hover:text-white sm:left-5" aria-label="Previous">
+            <ChevronLeft className="h-5 w-5" />
           </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/5 text-white/60 transition-all hover:bg-white/20 hover:text-white sm:right-4 sm:h-9 sm:w-9 md:right-6 md:h-10 md:w-10"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
+          <button onClick={nextSlide} className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/5 text-white/50 backdrop-blur-sm transition hover:bg-white/10 hover:text-white sm:right-5" aria-label="Next">
+            <ChevronRight className="h-5 w-5" />
           </button>
 
           {/* Dots */}
-          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
+          <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
             {heroSlides.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentSlide(i)}
-                className={`h-1.5 rounded-full transition-all duration-300 sm:h-2 ${
-                  i === currentSlide
-                    ? "w-6 bg-blue-500 sm:w-8"
-                    : "w-1.5 bg-white/40 hover:bg-white/60 sm:w-2"
-                }`}
+              <button key={i} onClick={() => setCurrentSlide(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 bg-white" : "w-1.5 bg-white/30 hover:bg-white/50"}`}
                 aria-label={`Slide ${i + 1}`}
               />
             ))}
@@ -299,164 +232,67 @@ export default function BerandaPage() {
         </div>
       </section>
 
-
-      {/* ─────────────── BERITA TERBARU (REAL DATA) ─────────────── */}
-      <motion.section
-        id="berita-terbaru"
-        className="py-16 sm:py-20 md:py-28"
-        {...sectionAnim}
-      >
+      {/* ─────────────── BERITA ─────────────── */}
+      <motion.section id="berita-terbaru" className="py-20 sm:py-24 lg:py-28" {...sectionAnim}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Section Header — Pulsing dot design */}
-          <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:mb-12 sm:flex-row sm:items-end">
+          <div className="mb-12 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <div className="mb-3 flex items-center gap-3">
-                <span className="relative flex h-3 w-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75" />
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-600" />
-                </span>
-                <span className="text-sm font-bold uppercase tracking-widest text-blue-600">
-                  Terbaru
-                </span>
-              </div>
-              <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
+              <span className="mb-3 inline-block text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Terbaru</span>
+              <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
                 Berita & Pengumuman
               </h2>
             </div>
-            <Link
-              href="/berita"
-              className="group inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors hover:text-blue-800"
-            >
-              Lihat Semua
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            <Link href="/berita" className="group inline-flex items-center gap-1.5 text-sm font-semibold text-gray-400 transition-colors hover:text-gray-900">
+              Lihat Semua <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
 
-          {/* Content */}
           {loadingArticles ? (
-            /* Loading skeleton */
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_380px]">
-              <div className="animate-pulse rounded-2xl border border-gray-200/80 bg-white">
-                <div className="aspect-[16/9] rounded-t-2xl bg-gray-200" />
-                <div className="space-y-3 p-6">
-                  <div className="h-3 w-20 rounded bg-gray-200" />
-                  <div className="h-6 w-3/4 rounded bg-gray-200" />
-                  <div className="h-4 w-full rounded bg-gray-100" />
-                  <div className="h-4 w-2/3 rounded bg-gray-100" />
-                </div>
-              </div>
-              <div className="flex flex-col gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="animate-pulse flex gap-4 rounded-xl border border-gray-200/80 bg-white p-4">
-                    <div className="h-20 w-24 shrink-0 rounded-lg bg-gray-200" />
-                    <div className="flex-1 space-y-2 py-1">
-                      <div className="h-3 w-16 rounded bg-gray-200" />
-                      <div className="h-4 w-full rounded bg-gray-200" />
-                      <div className="h-3 w-20 rounded bg-gray-100" />
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+              <div className="animate-pulse rounded-2xl bg-gray-100"><div className="aspect-[16/9]" /><div className="space-y-3 p-6"><div className="h-5 w-3/4 rounded bg-gray-200" /><div className="h-4 w-full rounded bg-gray-100" /></div></div>
+              <div className="flex flex-col gap-4">{[1,2,3].map(i => <div key={i} className="animate-pulse flex gap-4 rounded-xl bg-gray-100 p-4"><div className="h-20 w-24 shrink-0 rounded-lg bg-gray-200" /><div className="flex-1 space-y-2 py-1"><div className="h-4 w-full rounded bg-gray-200" /><div className="h-3 w-20 rounded bg-gray-100" /></div></div>)}</div>
             </div>
           ) : articles.length === 0 ? (
-            /* Empty state */
-            <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/50 p-10 text-center sm:p-16">
+            <div className="rounded-2xl border border-dashed border-gray-200 p-16 text-center">
               <Newspaper className="mx-auto mb-4 h-10 w-10 text-gray-300" />
-              <p className="text-sm font-medium text-gray-400">
-                Berita akan segera ditampilkan.
-              </p>
+              <p className="text-sm text-gray-400">Berita akan segera ditampilkan.</p>
             </div>
           ) : (
-            /* Real data grid */
-            <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_380px]">
-              {/* Featured article (big) */}
+            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
               {featuredArticle && (
                 <Link href={`/berita/${featuredArticle.slug || featuredArticle.id}`}>
-                  <article className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-900/5">
-                    <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-blue-100 to-slate-200">
+                  <article className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:shadow-xl hover:shadow-gray-900/[0.04]">
+                    <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                       {featuredArticle.thumbnail_url ? (
-                        <img
-                          src={featuredArticle.thumbnail_url}
-                          alt={featuredArticle.title}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
+                        <img src={featuredArticle.thumbnail_url} alt={featuredArticle.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       ) : (
-                        <>
-                          <div
-                            className="absolute inset-0 opacity-[0.06]"
-                            style={{
-                              backgroundImage:
-                                "radial-gradient(circle, #1e40af 1px, transparent 1px)",
-                              backgroundSize: "20px 20px",
-                            }}
-                          />
-                          <div className="flex h-full items-center justify-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm sm:h-20 sm:w-20">
-                              <Newspaper className="h-6 w-6 text-blue-400 sm:h-8 sm:w-8" />
-                            </div>
-                          </div>
-                        </>
+                        <div className="flex h-full items-center justify-center dot-grid-light">
+                          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/80 shadow-sm backdrop-blur-sm"><Newspaper className="h-7 w-7 text-gray-300" /></div>
+                        </div>
                       )}
-                      <div className="absolute left-3 top-3 sm:left-4 sm:top-4">
-                        <span className="text-xs font-black uppercase tracking-wider text-white drop-shadow-md">
-                          {featuredArticle.categories?.name || "UMUM"}
-                        </span>
+                      <div className="absolute left-4 top-4">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-white drop-shadow-md">{featuredArticle.categories?.name || "UMUM"}</span>
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>
-                    <div className="p-5 sm:p-6 md:p-8">
-                      <time className="mb-2 text-xs font-medium text-gray-400">
-                        {formatDate(featuredArticle.created_at)}
-                      </time>
-                      <h3 className="mb-3 text-lg font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-700 sm:text-xl md:text-2xl">
-                        {featuredArticle.title}
-                      </h3>
-                      {featuredArticle.excerpt && (
-                        <p className="mb-5 line-clamp-3 text-sm leading-relaxed text-gray-500">
-                          {featuredArticle.excerpt}
-                        </p>
-                      )}
-                      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors group-hover:text-blue-800">
-                        Baca Selengkapnya
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </span>
+                    <div className="p-6 sm:p-8">
+                      <time className="text-xs font-medium text-gray-400">{formatDate(featuredArticle.created_at)}</time>
+                      <h3 className="mt-2 text-xl font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-600 sm:text-2xl">{featuredArticle.title}</h3>
+                      {featuredArticle.excerpt && <p className="mt-3 line-clamp-2 text-sm text-gray-500">{featuredArticle.excerpt}</p>}
+                      <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">Baca Selengkapnya <ArrowRight className="h-3.5 w-3.5" /></span>
                     </div>
                   </article>
                 </Link>
               )}
-
-              {/* Side news list */}
               <div className="flex flex-col gap-4">
                 {sideArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/berita/${article.slug || article.id}`}
-                    className="group flex gap-3 rounded-xl border border-gray-200/80 bg-white p-3 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5 sm:gap-4 sm:p-4"
-                  >
-                    {/* Mini thumbnail */}
-                    <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-slate-100 to-slate-200 sm:h-20 sm:w-24">
-                      {article.thumbnail_url ? (
-                        <img
-                          src={article.thumbnail_url}
-                          alt={article.title}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <Newspaper className="h-5 w-5 text-blue-300" />
-                        </div>
-                      )}
+                  <Link key={article.id} href={`/berita/${article.slug || article.id}`} className="group flex gap-4 rounded-xl border border-gray-100 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:shadow-gray-900/[0.04]">
+                    <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                      {article.thumbnail_url ? <img src={article.thumbnail_url} alt={article.title} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center"><Newspaper className="h-5 w-5 text-gray-300" /></div>}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <span className="mb-1 inline-block border-b-2 border-blue-500 pb-0.5 text-[10px] font-black uppercase tracking-wider text-blue-500">
-                        {article.categories?.name || "UMUM"}
-                      </span>
-                      <h4 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-700">
-                        {article.title}
-                      </h4>
-                      <time className="mt-1.5 text-xs text-gray-400">
-                        {formatDate(article.created_at)}
-                      </time>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600">{article.categories?.name || "UMUM"}</span>
+                      <h4 className="mt-1 line-clamp-2 text-sm font-bold text-gray-900 transition-colors group-hover:text-blue-600">{article.title}</h4>
+                      <time className="mt-1.5 text-[11px] text-gray-400">{formatDate(article.created_at)}</time>
                     </div>
                   </Link>
                 ))}
@@ -467,144 +303,73 @@ export default function BerandaPage() {
       </motion.section>
 
       {/* ─────────────── PROGRAM KAMI ─────────────── */}
-      <motion.section
-        id="program-kami"
-        className="py-12 sm:py-16 md:py-28"
-        {...sectionAnim}
-      >
+      <motion.section id="program-kami" className="bg-gray-50/50 py-20 sm:py-24 lg:py-28" {...sectionAnim}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Section Header */}
-          <div className="mb-8 text-center sm:mb-14">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs font-medium text-blue-700 sm:mb-4 sm:px-4 sm:py-1.5 sm:text-sm">
-              <BookOpen className="h-4 w-4" />
-              <span>Layanan</span>
-            </div>
-            <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
-              Program Kami
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-gray-500 sm:mt-4 sm:text-sm md:text-base">
-              Berbagai program unggulan yang kami jalankan untuk mengembangkan potensi mahasiswa di bidang media dan jurnalistik.
+          <div className="mb-12 text-center">
+            <span className="mb-3 inline-block text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Layanan</span>
+            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">Program Kami</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-sm text-gray-500 sm:text-base">
+              Berbagai program unggulan yang kami jalankan untuk mengembangkan potensi mahasiswa.
             </p>
           </div>
 
-          {/* Programs Grid */}
           {loadingPrograms ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-2xl border border-gray-200/80 bg-white p-6 sm:p-8"
-                >
-                  <div className="mb-4 h-12 w-12 rounded-xl bg-gray-200" />
-                  <div className="mb-2 h-5 w-2/3 rounded bg-gray-200" />
-                  <div className="h-4 w-full rounded bg-gray-100" />
-                  <div className="mt-1 h-4 w-4/5 rounded bg-gray-100" />
-                </div>
-              ))}
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {[1,2,3].map(i => <div key={i} className="animate-pulse rounded-2xl border border-gray-100 bg-white p-8"><div className="mb-4 h-12 w-12 rounded-xl bg-gray-200" /><div className="mb-2 h-5 w-2/3 rounded bg-gray-200" /><div className="h-4 w-full rounded bg-gray-100" /></div>)}
             </div>
           ) : programs.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {programs.map((program, idx) => (
-                <motion.div
-                  key={program.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, ease: "easeOut" as const, delay: idx * 0.1 }}
-                  className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-blue-900/5 sm:p-8"
+                <motion.div key={program.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-gray-900/[0.04] sm:p-8"
                 >
-                  {/* Accent gradient bg on hover */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${
-                      programColors[idx % programColors.length]
-                    } opacity-0 transition-opacity duration-500 group-hover:opacity-[0.03]`}
-                  />
-                  <div className="relative">
-                    <div
-                      className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${
-                        programColors[idx % programColors.length]
-                      } shadow-md transition-transform duration-300 group-hover:scale-110`}
-                    >
-                      <BookOpen className="h-5 w-5 text-white" />
-                    </div>
-                    <h3 className="mb-2 text-base font-bold text-gray-900 transition-colors group-hover:text-blue-700 sm:text-lg">
-                      {program.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-gray-500">
-                      {program.description}
-                    </p>
+                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${programColors[idx % programColors.length]} shadow-lg transition-transform duration-300 group-hover:scale-110`}>
+                    <BookOpen className="h-5 w-5 text-white" />
                   </div>
+                  <h3 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-600">{program.title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-500">{program.description}</p>
                 </motion.div>
               ))}
             </div>
           ) : (
-            /* Fallback if no programs found */
-            <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50/50 p-10 text-center sm:p-16">
+            <div className="rounded-2xl border border-dashed border-gray-200 p-16 text-center">
               <BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-300" />
-              <p className="text-sm font-medium text-gray-400">
-                Program akan segera ditampilkan.
-              </p>
+              <p className="text-sm text-gray-400">Program akan segera ditampilkan.</p>
             </div>
           )}
         </div>
       </motion.section>
 
-
-      {/* ─────────────── COMPANY PROFILE SECTION ─────────────── */}
-      <motion.section
-        className="bg-gradient-to-b from-gray-50 via-white to-gray-50 py-12 sm:py-16 md:py-28"
-        {...sectionAnim}
-      >
+      {/* ─────────────── TENTANG ─────────────── */}
+      <motion.section className="py-20 sm:py-24 lg:py-28" {...sectionAnim}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid items-center gap-10 md:gap-12 lg:grid-cols-2 lg:gap-20">
-            {/* Left: Text */}
+          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs font-medium text-blue-700 sm:mb-4 sm:px-4 sm:py-1.5 sm:text-sm">
-                <Sparkles className="h-4 w-4" />
-                <span>Tentang Kami</span>
-              </div>
-              <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
+              <span className="mb-3 inline-block text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Tentang Kami</span>
+              <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl lg:text-4xl">
                 Tim Media Kreatif{" "}
-                <span className="text-blue-700">TEKAD UNM</span>
+                <span className="text-gradient">TEKAD UNM</span>
               </h2>
-              <p className="mt-4 text-xs leading-relaxed text-gray-600 sm:text-sm md:text-base">
-                TEKAD (Tim Edukasi, Kreativitas, Aspirasi, dan Dedikasi)
-                merupakan Unit Kegiatan Mahasiswa Administrasi Bisnis
-                Universitas Negeri Makassar yang bergerak di bidang jurnalistik
-                dan media kampus. Kami menjadi wadah komunikasi, publikasi, dan
-                informasi bagi seluruh civitas akademika.
+              <p className="mt-5 text-sm leading-relaxed text-gray-500 sm:text-base">
+                TEKAD (Tim Edukasi, Kreativitas, Aspirasi, dan Dedikasi) merupakan Unit Kegiatan Mahasiswa Administrasi Bisnis Universitas Negeri Makassar yang bergerak di bidang jurnalistik dan media kampus.
               </p>
-              <div className="mt-6 flex items-center gap-4">
-                <Link
-                  href="/tentang"
-                  className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-[0.98] sm:px-6 sm:py-3"
-                >
+              <div className="mt-7">
+                <Link href="/tentang" className="group inline-flex items-center gap-2 rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-gray-800 active:scale-[0.98]">
                   Selengkapnya
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>
             </div>
-
-            {/* Right: Divisi Cards */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
               {divisiData.map((d) => {
                 const Icon = d.icon;
                 return (
-                  <div
-                    key={d.name}
-                    className="group overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-900/5 sm:p-5"
-                  >
-                    <div
-                      className={`mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${d.color} shadow-md transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12`}
-                    >
-                      <Icon className="h-5 w-5 text-white" />
+                  <div key={d.name} className="group overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/[0.04]">
+                    <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gray-900 text-white transition-transform duration-300 group-hover:scale-110">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-bold text-gray-900">
-                      {d.name}
-                    </p>
-                    <p className="mt-1 text-[11px] leading-snug text-gray-400">
-                      {d.desc}
-                    </p>
+                    <p className="text-sm font-bold text-gray-900">{d.name}</p>
+                    <p className="mt-1 text-[11px] text-gray-400">{d.desc}</p>
                   </div>
                 );
               })}
@@ -613,101 +378,21 @@ export default function BerandaPage() {
         </div>
       </motion.section>
 
-      {/* ─────────────── GALERI ─────────────── */}
-      <motion.section
-        id="galeri"
-        className="py-12 sm:py-16 md:py-28"
-        {...sectionAnim}
-      >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 text-center sm:mb-14 md:mb-16">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs font-medium text-blue-700 sm:mb-4 sm:px-4 sm:py-1.5 sm:text-sm">
-              <Sparkles className="h-4 w-4" />
-              <span>Dokumentasi</span>
-            </div>
-            <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
-              Potret Kegiatan
-            </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-gray-500 sm:mt-4 sm:text-sm md:text-base">
-              Momen-momen berharga dari berbagai kegiatan TEKAD UNM.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
-            {galleryImages.map((img) => (
-              <div
-                key={img.id}
-                className={`group relative aspect-square cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-br ${img.color}`}
-              >
-                <div
-                  className="absolute inset-0 opacity-[0.04]"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle, #1e40af 1px, transparent 1px)",
-                    backgroundSize: "16px 16px",
-                  }}
-                />
-                <div className="flex h-full items-center justify-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/60 shadow-sm backdrop-blur-sm transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
-                    <Sparkles className="h-5 w-5 text-blue-500 sm:h-6 sm:w-6" />
-                  </div>
-                </div>
-                <div className="absolute inset-0 flex items-end bg-gradient-to-t from-blue-900/80 to-transparent p-3 opacity-0 transition-all duration-300 group-hover:opacity-100 sm:p-4 md:p-5">
-                  <div className="translate-y-2 transition-transform duration-300 group-hover:translate-y-0">
-                    <p className="text-xs font-semibold text-white sm:text-sm md:text-base">
-                      {img.alt}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 text-center sm:mt-14 md:mt-16">
-            <Link
-              href="/galeri"
-              className="group inline-flex items-center gap-2 rounded-xl border-2 border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition-all hover:border-blue-600 hover:bg-blue-50 hover:text-blue-700 sm:px-8 sm:py-3.5"
-            >
-              Lihat Semua Galeri
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
-        </div>
-      </motion.section>
-
-      {/* ─────────────── CTA SECTION ─────────────── */}
-      <motion.section
-        className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 py-12 sm:py-16 md:py-24"
-        {...sectionAnim}
-      >
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle, #fff 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }}
-        />
+      {/* ─────────────── CTA ─────────────── */}
+      <motion.section className="relative overflow-hidden bg-gray-950 py-20 sm:py-24" {...sectionAnim}>
+        <div className="absolute inset-0 dot-grid opacity-20" />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <h2 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl md:text-3xl lg:text-4xl">
+          <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-4xl">
             Bergabung Bersama TEKAD UNM
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-blue-100 sm:mt-4 sm:text-sm md:text-base">
-            Kembangkan potensimu di bidang jurnalistik, media kreatif, dan
-            teknologi bersama keluarga besar TEKAD.
+          <p className="mx-auto mt-4 max-w-xl text-sm text-gray-400 sm:text-base">
+            Kembangkan potensimu di bidang jurnalistik, media kreatif, dan teknologi.
           </p>
-          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-8 sm:flex-row sm:gap-4">
-            <Link
-              href="/daftar"
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-700 shadow-xl shadow-blue-900/20 transition-all hover:bg-gray-50 hover:shadow-2xl active:scale-[0.98] sm:w-auto sm:px-8 sm:py-3.5"
-            >
-              Daftar Sekarang
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+            <Link href="/daftar" className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-bold text-gray-900 transition-all hover:bg-gray-100 active:scale-[0.98] sm:w-auto">
+              Daftar Sekarang <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link
-              href="/tentang"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-white/30 px-6 py-3 text-sm font-semibold text-white transition-all hover:border-white/60 hover:bg-white/10 sm:w-auto sm:px-8 sm:py-3.5"
-            >
+            <Link href="/tentang" className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-8 py-3.5 text-sm font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5 sm:w-auto">
               Pelajari Lebih Lanjut
             </Link>
           </div>
