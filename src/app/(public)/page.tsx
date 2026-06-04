@@ -208,7 +208,7 @@ export default function BerandaPage() {
       {/* ─────────────── HERO SLIDER ─────────────── */}
       <section id="hero" className="relative overflow-hidden bg-gray-900">
         {/* Slides */}
-        <div className="relative h-[420px] sm:h-[480px] lg:h-[540px]">
+        <div className="relative h-[340px] sm:h-[420px] md:h-[480px] lg:h-[540px]">
           {heroSlides.map((slide, index) => (
             <div
               key={slide.id}
@@ -236,26 +236,26 @@ export default function BerandaPage() {
 
               {/* Content */}
               <div className="relative flex h-full items-center">
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                  <div className="max-w-2xl">
-                    <span className="mb-4 inline-block rounded-md bg-blue-500/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-300 backdrop-blur-sm">
+                <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 md:px-12 lg:px-8">
+                  <div className="max-w-xl lg:max-w-2xl">
+                    <span className="mb-3 inline-block rounded-md bg-blue-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-blue-300 backdrop-blur-sm sm:mb-4 sm:px-3 sm:text-xs">
                       {slide.category}
                     </span>
-                    <h2 className="text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+                    <h2 className="text-xl font-extrabold leading-tight tracking-tight text-white sm:text-2xl md:text-3xl lg:text-5xl">
                       {slide.title}
                     </h2>
-                    <p className="mt-4 max-w-lg text-sm leading-relaxed text-gray-300 sm:text-base">
+                    <p className="mt-3 max-w-md text-xs leading-relaxed text-gray-300 sm:mt-4 sm:max-w-lg sm:text-sm md:text-base">
                       {slide.excerpt}
                     </p>
-                    <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+                    <div className="mt-4 flex flex-col items-start gap-2 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
                       <Link
                         href={`/berita/${slide.id}`}
-                        className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-[0.98] sm:px-6 sm:py-3"
+                        className="group inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-[0.98] sm:px-6 sm:py-3 sm:text-sm"
                       >
                         Baca Selengkapnya
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 sm:h-4 sm:w-4" />
                       </Link>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-xs text-gray-400 sm:text-sm">
                         {slide.date}
                       </span>
                     </div>
@@ -265,32 +265,32 @@ export default function BerandaPage() {
             </div>
           ))}
 
-          {/* Navigation arrows */}
+          {/* Navigation arrows — small & transparent on mobile */}
           <button
             onClick={prevSlide}
-            className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:left-6 sm:h-10 sm:w-10"
+            className="absolute left-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/5 text-white/60 transition-all hover:bg-white/20 hover:text-white sm:left-4 sm:h-9 sm:w-9 md:left-6 md:h-10 md:w-10"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-all hover:bg-white/20 sm:right-6 sm:h-10 sm:w-10"
+            className="absolute right-1 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-white/5 text-white/60 transition-all hover:bg-white/20 hover:text-white sm:right-4 sm:h-9 sm:w-9 md:right-6 md:h-10 md:w-10"
             aria-label="Next slide"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
 
           {/* Dots */}
-          <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
+          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 sm:bottom-6 sm:gap-2">
             {heroSlides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentSlide(i)}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-300 sm:h-2 ${
                   i === currentSlide
-                    ? "w-8 bg-blue-500"
-                    : "w-2 bg-white/40 hover:bg-white/60"
+                    ? "w-6 bg-blue-500 sm:w-8"
+                    : "w-1.5 bg-white/40 hover:bg-white/60 sm:w-2"
                 }`}
                 aria-label={`Slide ${i + 1}`}
               />
@@ -319,7 +319,7 @@ export default function BerandaPage() {
                   Terbaru
                 </span>
               </div>
-              <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+              <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
                 Berita & Pengumuman
               </h2>
             </div>
@@ -335,7 +335,7 @@ export default function BerandaPage() {
           {/* Content */}
           {loadingArticles ? (
             /* Loading skeleton */
-            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_380px]">
               <div className="animate-pulse rounded-2xl border border-gray-200/80 bg-white">
                 <div className="aspect-[16/9] rounded-t-2xl bg-gray-200" />
                 <div className="space-y-3 p-6">
@@ -368,7 +368,7 @@ export default function BerandaPage() {
             </div>
           ) : (
             /* Real data grid */
-            <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
+            <div className="grid gap-4 sm:gap-6 lg:grid-cols-[1fr_380px]">
               {/* Featured article (big) */}
               {featuredArticle && (
                 <Link href={`/berita/${featuredArticle.slug || featuredArticle.id}`}>
@@ -469,20 +469,20 @@ export default function BerandaPage() {
       {/* ─────────────── PROGRAM KAMI ─────────────── */}
       <motion.section
         id="program-kami"
-        className="py-16 sm:py-20 md:py-28"
+        className="py-12 sm:py-16 md:py-28"
         {...sectionAnim}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
-          <div className="mb-10 text-center sm:mb-14">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700">
+          <div className="mb-8 text-center sm:mb-14">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs font-medium text-blue-700 sm:mb-4 sm:px-4 sm:py-1.5 sm:text-sm">
               <BookOpen className="h-4 w-4" />
               <span>Layanan</span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+            <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
               Program Kami
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-500 sm:text-base">
+            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-gray-500 sm:mt-4 sm:text-sm md:text-base">
               Berbagai program unggulan yang kami jalankan untuk mengembangkan potensi mahasiswa di bidang media dan jurnalistik.
             </p>
           </div>
@@ -552,22 +552,22 @@ export default function BerandaPage() {
 
       {/* ─────────────── COMPANY PROFILE SECTION ─────────────── */}
       <motion.section
-        className="bg-gradient-to-b from-gray-50 via-white to-gray-50 py-16 sm:py-20 md:py-28"
+        className="bg-gradient-to-b from-gray-50 via-white to-gray-50 py-12 sm:py-16 md:py-28"
         {...sectionAnim}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-10 md:gap-12 lg:grid-cols-2 lg:gap-20">
             {/* Left: Text */}
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs font-medium text-blue-700 sm:mb-4 sm:px-4 sm:py-1.5 sm:text-sm">
                 <Sparkles className="h-4 w-4" />
                 <span>Tentang Kami</span>
               </div>
-              <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+              <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
                 Tim Media Kreatif{" "}
                 <span className="text-blue-700">TEKAD UNM</span>
               </h2>
-              <p className="mt-5 text-sm leading-relaxed text-gray-600 sm:text-base">
+              <p className="mt-4 text-xs leading-relaxed text-gray-600 sm:text-sm md:text-base">
                 TEKAD (Tim Edukasi, Kreativitas, Aspirasi, dan Dedikasi)
                 merupakan Unit Kegiatan Mahasiswa Administrasi Bisnis
                 Universitas Negeri Makassar yang bergerak di bidang jurnalistik
@@ -616,19 +616,19 @@ export default function BerandaPage() {
       {/* ─────────────── GALERI ─────────────── */}
       <motion.section
         id="galeri"
-        className="py-16 sm:py-20 md:py-28"
+        className="py-12 sm:py-16 md:py-28"
         {...sectionAnim}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center sm:mb-14 md:mb-16">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700">
+          <div className="mb-8 text-center sm:mb-14 md:mb-16">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-3 py-1 text-xs font-medium text-blue-700 sm:mb-4 sm:px-4 sm:py-1.5 sm:text-sm">
               <Sparkles className="h-4 w-4" />
               <span>Dokumentasi</span>
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+            <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-2xl md:text-3xl lg:text-4xl">
               Potret Kegiatan
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-gray-500 sm:text-base">
+            <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-gray-500 sm:mt-4 sm:text-sm md:text-base">
               Momen-momen berharga dari berbagai kegiatan TEKAD UNM.
             </p>
           </div>
@@ -677,7 +677,7 @@ export default function BerandaPage() {
 
       {/* ─────────────── CTA SECTION ─────────────── */}
       <motion.section
-        className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 py-16 sm:py-20 md:py-24"
+        className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 py-12 sm:py-16 md:py-24"
         {...sectionAnim}
       >
         <div
@@ -689,14 +689,14 @@ export default function BerandaPage() {
           }}
         />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6">
-          <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl md:text-4xl">
+          <h2 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl md:text-3xl lg:text-4xl">
             Bergabung Bersama TEKAD UNM
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
+          <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-blue-100 sm:mt-4 sm:text-sm md:text-base">
             Kembangkan potensimu di bidang jurnalistik, media kreatif, dan
             teknologi bersama keluarga besar TEKAD.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+          <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-8 sm:flex-row sm:gap-4">
             <Link
               href="/daftar"
               className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-700 shadow-xl shadow-blue-900/20 transition-all hover:bg-gray-50 hover:shadow-2xl active:scale-[0.98] sm:w-auto sm:px-8 sm:py-3.5"
