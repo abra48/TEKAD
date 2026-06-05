@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     // Inisialisasi Supabase
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Insert ke tabel member_registrations
     const { error } = await supabase.from("member_registrations").insert([

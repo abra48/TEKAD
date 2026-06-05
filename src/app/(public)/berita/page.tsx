@@ -26,7 +26,7 @@ export default async function BeritaPage() {
   let berita: any[] | null = null;
 
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data } = await supabase
       .from("news_articles")
       .select("*")
@@ -159,7 +159,7 @@ export default async function BeritaPage() {
                       {news.excerpt}
                     </p>
                     <Link
-                      href={`/berita/${news.id}`}
+                      href={`/berita/${news.slug || news.id}`}
                       className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors duration-200 hover:text-blue-800"
                     >
                       Baca Selengkapnya

@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Galeri Kegiatan", description: "Doku
 export const dynamic = "force-dynamic";
 
 export default async function GaleriPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: galeri } = await supabase.from("gallery").select("*").order("created_at", { ascending: false });
   const photos = galeri ?? [];
 

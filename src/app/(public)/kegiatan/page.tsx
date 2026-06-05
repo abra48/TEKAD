@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Agenda & Kegiatan", description: "Ja
 export const dynamic = "force-dynamic";
 
 export default async function KegiatanPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: events } = await supabase.from("events").select("*").eq("is_published", true).order("event_date", { ascending: false });
   const allEvents = events ?? [];
   const today = new Date(); today.setHours(0, 0, 0, 0);
