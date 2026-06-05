@@ -364,6 +364,14 @@ export default function BeritaBaruPage() {
                   className="sr-only"
                 />
               </label>
+              <div className="mt-3 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
+                <p className="mb-1.5 text-[11px] font-semibold text-blue-700">📐 Panduan Thumbnail</p>
+                <ul className="space-y-0.5 text-[10px] text-blue-600/80">
+                  <li>• Ukuran ideal: <strong>1200 × 675 px</strong> (rasio 16:9)</li>
+                  <li>• Format: JPG, PNG, WebP — Maks <strong>5 MB</strong></li>
+                  <li>• Tips: Gunakan foto horizontal yang jelas & kontras tinggi</li>
+                </ul>
+              </div>
             </div>
           </div>
 

@@ -73,6 +73,16 @@ export default function GaleriBaruPage() {
               <span className="text-sm font-medium text-gray-500 group-hover:text-blue-700 dark:group-hover:text-blue-300">{imageFile ? imageFile.name : "Pilih File Foto"}</span>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="sr-only" />
             </label>
+            <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-500/10 dark:bg-blue-500/5">
+              <p className="mb-2 text-xs font-semibold text-blue-700 dark:text-blue-400">📐 Panduan Upload Foto</p>
+              <ul className="space-y-1 text-[11px] text-blue-600/80 dark:text-blue-400/70">
+                <li>• <strong>Ukuran ideal:</strong> 1200 × 800 px (rasio 3:2, landscape)</li>
+                <li>• <strong>Ukuran minimum:</strong> 800 × 600 px agar tidak pecah</li>
+                <li>• <strong>Format:</strong> JPG, PNG, atau WebP</li>
+                <li>• <strong>Maks file:</strong> 5 MB</li>
+                <li>• <strong>Tips:</strong> Gunakan foto horizontal berkualitas tinggi untuk tampilan terbaik di galeri</li>
+              </ul>
+            </div>
           </div>
 
           <div>

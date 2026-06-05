@@ -5,7 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Users, Newspaper, CalendarDays, ArrowRight, ChevronRight, ChevronLeft,
-  Globe, AtSign, Film, PenLine, Monitor, BookOpen, Camera,
+  Globe, AtSign, Film, PenLine, Monitor, Camera, Lightbulb, Megaphone,
+  GraduationCap, Target, Handshake, Award, Rocket, BarChart3, Mic,
+  Heart, Briefcase, Palette, Presentation, Wrench, Zap, Layers,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -13,11 +15,35 @@ interface Program { id: string; title: string; description: string; icon_name?: 
 interface Article { id: string; title: string; slug?: string; excerpt?: string; status: string; is_featured: boolean; thumbnail_url?: string | null; created_at: string; categories?: { name: string } | null; }
 interface GalleryItem { id: string; title: string; image_url: string | null; caption?: string; }
 
-const heroSlides = [
-  { id: 1, title: "Pelantikan Pengurus TEKAD Periode 2025/2026 Resmi Digelar", excerpt: "Kepengurusan baru TEKAD UNM resmi dilantik di Aula Gedung PKM pada Sabtu, 12 April 2025.", category: "Organisasi", date: "12 Apr 2025" },
-  { id: 2, title: "Workshop Jurnalistik: Menulis Berita yang Berdampak", excerpt: "TEKAD UNM mengadakan workshop jurnalistik bersama praktisi media nasional.", category: "Akademik", date: "28 Mar 2025" },
-  { id: 3, title: "TEKAD Raih Juara 2 Lomba Karya Tulis Ilmiah Tingkat Regional", excerpt: "Tim perwakilan TEKAD berhasil meraih Juara 2 LKTI tingkat regional Sulawesi Selatan.", category: "Prestasi", date: "15 Mar 2025" },
+/* Icon mapping — picks professional icons based on program title keywords */
+const iconKeywords: [string[], React.ComponentType<{ className?: string }>][] = [
+  [["pelatihan", "training", "workshop", "belajar"], GraduationCap],
+  [["jurnalistik", "berita", "reporter", "liputan", "media"], Mic],
+  [["kreativ", "desain", "design", "konten", "content"], Palette],
+  [["website", "web", "digital", "teknologi", "it"], Monitor],
+  [["sosial", "pengabdian", "volunteer", "peduli"], Heart],
+  [["lomba", "kompetisi", "prestasi", "juara"], Award],
+  [["rapat", "musyawarah", "diskusi", "forum"], Presentation],
+  [["rekrut", "pendaftaran", "anggota", "kader"], Users],
+  [["kerja sama", "kolaborasi", "mitra", "partner"], Handshake],
+  [["riset", "penelitian", "analisis", "data"], BarChart3],
+  [["publikasi", "penerbitan", "majalah", "buletin"], Newspaper],
+  [["inovasi", "ide", "gagasan"], Lightbulb],
+  [["kampanye", "promosi", "sosialisasi", "branding"], Megaphone],
+  [["target", "strategi", "rencana", "program kerja"], Target],
+  [["pengembangan", "upgrade", "development"], Rocket],
+  [["produksi", "video", "film", "youtube", "tiktok"], Film],
+  [["layanan", "service", "operasional"], Wrench],
+  [["proyek", "project", "bisnis", "usaha"], Briefcase],
 ];
+
+function getIconForProgram(title: string): React.ComponentType<{ className?: string }> {
+  const lower = title.toLowerCase();
+  for (const [keywords, Icon] of iconKeywords) {
+    if (keywords.some((kw) => lower.includes(kw))) return Icon;
+  }
+  return Zap; // default professional icon
+}
 
 const divisiData = [
   { icon: Monitor, name: "Website", desc: "Pengembangan & pengelolaan web" },
@@ -29,6 +55,11 @@ const divisiData = [
 
 const programColors = ["from-blue-500 to-blue-600", "from-indigo-500 to-indigo-600", "from-sky-500 to-blue-600", "from-violet-500 to-purple-600", "from-teal-500 to-cyan-600", "from-blue-600 to-indigo-600"];
 
+/* Fallback hero slides — only shown while articles are loading */
+const fallbackSlides = [
+  { title: "Selamat Datang di TEKAD UNM", excerpt: "Tim Media Kreatif Administrasi Bisnis — Universitas Negeri Makassar", category: "TEKAD", slug: "" },
+];
+
 export default function BerandaPage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [programs, setPrograms] = useState<Program[]>([]);
@@ -37,8 +68,22 @@ export default function BerandaPage() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(true);
 
-  const nextSlide = useCallback(() => { setCurrentSlide((p) => (p + 1) % heroSlides.length); }, []);
-  const prevSlide = () => { setCurrentSlide((p) => (p - 1 + heroSlides.length) % heroSlides.length); };
+  /* Derive hero slides from published articles (max 3) */
+  const heroSlides = articles.length > 0
+    ? articles.slice(0, 3).map((a) => ({
+        title: a.title,
+        excerpt: a.excerpt || "",
+        category: a.categories?.name || "Berita",
+        slug: a.slug || a.id,
+        thumbnail: a.thumbnail_url || null,
+        date: new Date(a.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+      }))
+    : fallbackSlides.map((s) => ({ ...s, thumbnail: null as string | null, date: "" }));
+
+  const slideCount = heroSlides.length;
+
+  const nextSlide = useCallback(() => { setCurrentSlide((p) => (p + 1) % slideCount); }, [slideCount]);
+  const prevSlide = () => { setCurrentSlide((p) => (p - 1 + slideCount) % slideCount); };
 
   useEffect(() => { const t = setInterval(nextSlide, 5000); return () => clearInterval(t); }, [nextSlide]);
 
@@ -69,23 +114,32 @@ export default function BerandaPage() {
 
   return (
     <>
-      {/* ── HERO ── */}
+      {/* ── HERO — Data-driven from published articles ── */}
       <section id="hero" className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-700 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         <div className="pointer-events-none absolute inset-0 dot-grid opacity-10" />
         <div className="relative h-[380px] sm:h-[440px] md:h-[500px] lg:h-[560px]">
           {heroSlides.map((slide, i) => (
-            <div key={slide.id} className={`absolute inset-0 transition-all duration-700 ease-in-out ${i === currentSlide ? "translate-x-0 opacity-100" : i < currentSlide ? "-translate-x-full opacity-0" : "translate-x-full opacity-0"}`}>
+            <div key={i} className={`absolute inset-0 transition-all duration-700 ease-in-out ${i === currentSlide ? "translate-x-0 opacity-100" : i < currentSlide ? "-translate-x-full opacity-0" : "translate-x-full opacity-0"}`}>
+              {/* Background thumbnail image */}
+              {slide.thumbnail && (
+                <div className="absolute inset-0">
+                  <Image src={slide.thumbnail} alt={slide.title} fill className="object-cover" sizes="100vw" priority={i === 0} />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+                </div>
+              )}
               <div className="relative flex h-full items-center">
                 <div className="mx-auto w-full max-w-7xl px-6 sm:px-10 lg:px-8">
                   <div className="max-w-2xl">
                     <span className="mb-4 inline-block rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-white/80 backdrop-blur-sm sm:text-xs">{slide.category}</span>
                     <h2 className="text-2xl font-extrabold leading-[1.15] tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">{slide.title}</h2>
-                    <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">{slide.excerpt}</p>
+                    {slide.excerpt && <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70 sm:text-base">{slide.excerpt}</p>}
                     <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
-                      <Link href={`/berita/${slide.id}`} className="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-blue-700 transition-all hover:bg-gray-100 active:scale-[0.98] sm:px-6 dark:bg-white dark:text-gray-900">
-                        Baca Selengkapnya <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                      </Link>
-                      <span className="text-xs text-white/50">{slide.date}</span>
+                      {slide.slug && (
+                        <Link href={`/berita/${slide.slug}`} className="group inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13px] font-semibold text-blue-700 transition-all hover:bg-gray-100 active:scale-[0.98] sm:px-6 dark:bg-white dark:text-gray-900">
+                          Baca Selengkapnya <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </Link>
+                      )}
+                      {slide.date && <span className="text-xs text-white/50">{slide.date}</span>}
                     </div>
                   </div>
                 </div>
@@ -151,7 +205,7 @@ export default function BerandaPage() {
         </div>
       </section>
 
-      {/* ── PROGRAM ── */}
+      {/* ── PROGRAM — with smart icon mapping ── */}
       <section id="program-kami" className="bg-gray-50/50 py-20 sm:py-24 lg:py-28 dark:bg-gray-900/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
@@ -163,15 +217,18 @@ export default function BerandaPage() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">{[1,2,3].map(i => <div key={i} className="animate-pulse rounded-2xl border border-gray-100 bg-white p-8 dark:border-gray-800 dark:bg-gray-900"><div className="mb-4 h-12 w-12 rounded-xl bg-gray-200 dark:bg-gray-800" /><div className="mb-2 h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-800" /><div className="h-4 w-full rounded bg-gray-100 dark:bg-gray-800" /></div>)}</div>
           ) : programs.length > 0 ? (
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {programs.map((program, idx) => (
-                <div key={program.id} className="group overflow-hidden rounded-2xl border border-gray-100 bg-white p-7 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gray-900/[0.04] dark:border-gray-800 dark:bg-gray-900 sm:p-8">
-                  <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${programColors[idx % programColors.length]} shadow-lg transition-transform duration-200 group-hover:scale-105`}><BookOpen className="h-5 w-5 text-white" /></div>
-                  <h3 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">{program.title}</h3>
-                  <p className="text-sm leading-relaxed text-gray-500">{program.description}</p>
-                </div>
-              ))}
+              {programs.map((program, idx) => {
+                const ProgramIcon = getIconForProgram(program.title);
+                return (
+                  <div key={program.id} className="group overflow-hidden rounded-2xl border border-gray-100 bg-white p-7 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-gray-900/[0.04] dark:border-gray-800 dark:bg-gray-900 sm:p-8">
+                    <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${programColors[idx % programColors.length]} shadow-lg transition-transform duration-200 group-hover:scale-105`}><ProgramIcon className="h-5 w-5 text-white" /></div>
+                    <h3 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">{program.title}</h3>
+                    <p className="text-sm leading-relaxed text-gray-500">{program.description}</p>
+                  </div>
+                );
+              })}
             </div>
-          ) : (<div className="rounded-2xl border border-dashed border-gray-200 p-16 text-center dark:border-gray-800"><BookOpen className="mx-auto mb-4 h-10 w-10 text-gray-300 dark:text-gray-700" /><p className="text-sm text-gray-400">Program akan segera ditampilkan.</p></div>)}
+          ) : (<div className="rounded-2xl border border-dashed border-gray-200 p-16 text-center dark:border-gray-800"><Layers className="mx-auto mb-4 h-10 w-10 text-gray-300 dark:text-gray-700" /><p className="text-sm text-gray-400">Program akan segera ditampilkan.</p></div>)}
         </div>
       </section>
 
@@ -188,10 +245,8 @@ export default function BerandaPage() {
             </div>
           </div>
           <div className="relative">
-            {/* Fade edges */}
             <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-20 bg-gradient-to-r from-white to-transparent dark:from-gray-950" />
             <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-20 bg-gradient-to-l from-white to-transparent dark:from-gray-950" />
-            {/* Marquee track */}
             <div className="flex animate-marquee gap-4" style={{ width: 'max-content' }}>
               {[...gallery, ...gallery].map((foto, i) => (
                 <div key={`${foto.id}-${i}`} className="group relative h-48 w-72 shrink-0 overflow-hidden rounded-2xl bg-gray-100 sm:h-56 sm:w-80 dark:bg-gray-800">

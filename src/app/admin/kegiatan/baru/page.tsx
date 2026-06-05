@@ -77,6 +77,14 @@ export default function KegiatanBaruPage() {
               <Upload className="h-4 w-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" /><span className="text-sm font-medium text-gray-500 group-hover:text-blue-700 dark:group-hover:text-blue-300">{thumbnailFile ? thumbnailFile.name : "Pilih File Thumbnail"}</span>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="sr-only" />
             </label>
+            <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 p-4 dark:border-blue-500/10 dark:bg-blue-500/5">
+              <p className="mb-2 text-xs font-semibold text-blue-700 dark:text-blue-400">📐 Panduan Upload Thumbnail</p>
+              <ul className="space-y-1 text-[11px] text-blue-600/80 dark:text-blue-400/70">
+                <li>• <strong>Ukuran ideal:</strong> 1200 × 675 px (rasio 16:9)</li>
+                <li>• <strong>Format:</strong> JPG, PNG, atau WebP — Maks <strong>5 MB</strong></li>
+                <li>• <strong>Tips:</strong> Gunakan foto landscape berkualitas tinggi agar tampilan proporsional</li>
+              </ul>
+            </div>
           </div>
         </div>
         <div className="border-t border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-gray-800 dark:bg-gray-800/30">
