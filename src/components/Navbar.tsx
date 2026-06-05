@@ -42,6 +42,7 @@ export default function Navbar() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileAccordion, setMobileAccordion] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
 
   /* Handle hash link navigation (Next.js Link doesn't scroll to hash on page transitions) */
@@ -111,6 +112,10 @@ export default function Navbar() {
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8">
           <Link href="/" className="group flex items-center gap-2.5">
             <img src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png" alt="Logo TEKAD" className="h-9 w-auto" />
+            <div className="flex flex-col leading-none">
+              <span className="text-sm font-bold tracking-tight text-gray-900 dark:text-white">TEKAD</span>
+              <span className="text-[9px] font-semibold tracking-[0.2em] text-blue-600 dark:text-blue-400">UNM</span>
+            </div>
           </Link>
 
           <ul className="hidden items-center gap-1 lg:flex">
@@ -152,13 +157,14 @@ export default function Navbar() {
         </nav>
 
         {/* Search Bar */}
-        <div className={`overflow-hidden border-t border-gray-100 bg-white transition-all duration-300 dark:border-gray-800 dark:bg-gray-950 ${searchOpen ? "max-h-20 py-3" : "max-h-0 py-0"}`}>
-          <div className="mx-auto flex max-w-2xl items-center gap-3 px-4 sm:px-6">
+          <div className={`overflow-hidden border-t border-gray-100 bg-white transition-all duration-300 dark:border-gray-800 dark:bg-gray-950 ${searchOpen ? "max-h-20 py-3" : "max-h-0 py-0"}`}>
+          <form onSubmit={(e) => { e.preventDefault(); if (searchQuery.trim()) { router.push(`/berita?q=${encodeURIComponent(searchQuery.trim())}`); setSearchOpen(false); setSearchQuery(""); } }} className="mx-auto flex max-w-2xl items-center gap-3 px-4 sm:px-6">
             <Search className="h-5 w-5 shrink-0 text-gray-400" />
-            <input type="text" placeholder="Cari berita, kegiatan, atau informasi..." className="w-full border-0 bg-transparent py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white dark:placeholder:text-gray-600" autoFocus={searchOpen} />
-            <button onClick={() => setSearchOpen(false)} className="shrink-0 rounded-md p-1 text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+            <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Cari berita, kegiatan, atau informasi..." className="w-full border-0 bg-transparent py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none dark:text-white dark:placeholder:text-gray-600" autoFocus={searchOpen} />
+            <button type="submit" className="shrink-0 rounded-md px-3 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-500/10">Cari</button>
+            <button type="button" onClick={() => { setSearchOpen(false); setSearchQuery(""); }} className="shrink-0 rounded-md p-1 text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+          </form>
           </div>
-        </div>
 
         {/* Mobile Menu */}
         <AnimatePresence>

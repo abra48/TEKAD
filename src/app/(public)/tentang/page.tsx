@@ -193,7 +193,7 @@ export default function TentangPage() {
   return (
     <>
       {/* ─────────────── HEADER ─────────────── */}
-      <section className="relative overflow-hidden border-b border-gray-100 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+      <section className="relative overflow-hidden border-b border-gray-100 bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:border-gray-800 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -right-32 -top-32 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-blue-100/50 to-sky-200/30 blur-3xl" />
           <div className="absolute -left-20 bottom-0 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-indigo-100/40 to-purple-100/20 blur-3xl" />
@@ -219,20 +219,20 @@ export default function TentangPage() {
               className="mb-5 flex items-center justify-center gap-3"
             >
               <span className="h-px w-8 bg-gradient-to-r from-transparent to-blue-600" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-blue-600">Media & Publikasi</span>
+              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-blue-600 dark:text-blue-400">Media & Publikasi</span>
               <span className="h-px w-8 bg-gradient-to-l from-transparent to-blue-600" />
             </motion.div>
 
             <motion.h1
               variants={staggerItem}
-              className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl"
+              className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl dark:text-white"
             >
-              Tentang <span className="text-blue-700">TEKAD UNM</span>
+              Tentang <span className="text-blue-700 dark:text-blue-400">TEKAD UNM</span>
             </motion.h1>
 
             <motion.p
               variants={staggerItem}
-              className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-gray-500"
+              className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-gray-500 dark:text-gray-400"
             >
               Mengenal lebih dekat Tim Media Kreatif Administrasi Bisnis
               Universitas Negeri Makassar.
@@ -242,7 +242,7 @@ export default function TentangPage() {
       </section>
 
       {/* ─────────────── PROFIL ─────────────── */}
-      <section className="py-16 sm:py-20">
+      <section className="py-16 sm:py-20 dark:bg-gray-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             className="mx-auto max-w-3xl"
@@ -251,12 +251,12 @@ export default function TentangPage() {
             viewport={{ once: true, amount: 0.3 }}
             variants={scaleIn}
           >
-            <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-8 shadow-sm sm:p-10">
+            <div className="relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-8 shadow-sm sm:p-10 dark:border-gray-700 dark:bg-gray-900">
               {/* Accent bar */}
               <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400" />
 
               <div className="mb-6 flex items-center gap-4">
-                <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-600/15 ring-1 ring-gray-100">
+                <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-600/15 ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700">
                   <Image
                     src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png"
                     alt="Logo TEKAD UNM"
@@ -266,17 +266,17 @@ export default function TentangPage() {
                   />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-extrabold text-gray-900">
+                  <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white">
                     TEKAD
                   </h2>
-                  <p className="text-sm font-medium text-blue-600">
+                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
                     Tim Edukasi, Kreativitas, Aspirasi & Dedikasi
                   </p>
                 </div>
               </div>
 
-              <p className="text-base leading-relaxed text-gray-600">
-                <strong className="text-gray-900">TEKAD</strong> (Tim Media
+              <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">
+                <strong className="text-gray-900 dark:text-white">TEKAD</strong> (Tim Media
                 Kreatif Administrasi Bisnis) adalah wadah komunikasi, publikasi,
                 dan informasi seputar kegiatan akademik maupun non-akademik di
                 lingkungan Program Studi Administrasi Bisnis, Universitas Negeri
@@ -290,7 +290,7 @@ export default function TentangPage() {
       </section>
 
       {/* ─────────────── VISI & MISI ─────────────── */}
-      <section id="visi-misi" className="scroll-mt-20 bg-gradient-to-b from-white via-slate-50/50 to-white py-16 sm:py-20">
+      <section id="visi-misi" className="scroll-mt-20 bg-gradient-to-b from-white via-slate-50/50 to-white py-16 sm:py-20 dark:from-gray-950 dark:via-gray-900/50 dark:to-gray-950">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             className="mb-12 text-center"
@@ -301,13 +301,13 @@ export default function TentangPage() {
           >
             <motion.h2
               variants={staggerItem}
-              className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl"
+              className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl dark:text-white"
             >
               Visi & Misi
             </motion.h2>
             <motion.p
               variants={staggerItem}
-              className="mx-auto mt-3 max-w-xl text-base text-gray-500"
+              className="mx-auto mt-3 max-w-xl text-base text-gray-500 dark:text-gray-400"
             >
               Arah dan tujuan yang menjadi landasan setiap langkah TEKAD UNM.
             </motion.p>
@@ -316,7 +316,7 @@ export default function TentangPage() {
           <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 md:gap-8">
             {/* VISI */}
             <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-8 transition-shadow duration-300 sm:p-10"
+              className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-8 transition-shadow duration-300 sm:p-10 dark:border-gray-700 dark:bg-gray-900"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
@@ -328,13 +328,13 @@ export default function TentangPage() {
                   "0 20px 40px -12px rgba(59, 130, 246, 0.15), 0 0 0 1px rgba(59, 130, 246, 0.08)",
               }}
             >
-              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-50 transition-transform duration-500 group-hover:scale-150" />
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-blue-50 transition-transform duration-500 group-hover:scale-150 dark:bg-blue-500/10" />
               <div className="relative">
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
-                  <Eye className="h-6 w-6 text-blue-600" />
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-500/20">
+                  <Eye className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <h3 className="mb-4 text-xl font-bold text-gray-900">Visi</h3>
-                <p className="text-base leading-relaxed text-gray-600">
+                <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">Visi</h3>
+                <p className="text-base leading-relaxed text-gray-600 dark:text-gray-300">
                   Menjadi pusat informasi dan penggerak media kreatif terdepan di
                   lingkungan Administrasi Bisnis UNM yang profesional, inovatif,
                   dan berdampak positif bagi seluruh civitas akademika.
@@ -344,7 +344,7 @@ export default function TentangPage() {
 
             {/* MISI */}
             <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-8 transition-shadow duration-300 sm:p-10"
+              className="group relative overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-8 transition-shadow duration-300 sm:p-10 dark:border-gray-700 dark:bg-gray-900"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
@@ -356,12 +356,12 @@ export default function TentangPage() {
                   "0 20px 40px -12px rgba(99, 102, 241, 0.15), 0 0 0 1px rgba(99, 102, 241, 0.08)",
               }}
             >
-              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-indigo-50 transition-transform duration-500 group-hover:scale-150" />
+              <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-indigo-50 transition-transform duration-500 group-hover:scale-150 dark:bg-indigo-500/10" />
               <div className="relative">
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100">
-                  <Target className="h-6 w-6 text-indigo-600" />
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-500/20">
+                  <Target className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
-                <h3 className="mb-4 text-xl font-bold text-gray-900">Misi</h3>
+                <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">Misi</h3>
                 <ul className="space-y-3">
                   {misiList.map((misi, idx) => (
                     <motion.li
@@ -373,7 +373,7 @@ export default function TentangPage() {
                       transition={{ delay: 0.3 + idx * 0.1, duration: 0.4 }}
                     >
                       <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
-                      <span className="text-base leading-relaxed text-gray-600">
+                      <span className="text-base leading-relaxed text-gray-600 dark:text-gray-300">
                         {misi}
                       </span>
                     </motion.li>
@@ -386,7 +386,7 @@ export default function TentangPage() {
       </section>
 
       {/* ─────────────── STRUKTUR ORGANISASI ─────────────── */}
-      <section id="divisi" className="scroll-mt-20 relative overflow-hidden py-16 sm:py-24">
+      <section id="divisi" className="scroll-mt-20 relative overflow-hidden py-16 sm:py-24 dark:bg-gray-950">
         {/* Background texture */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-b from-blue-50/80 to-transparent blur-3xl" />
@@ -403,13 +403,13 @@ export default function TentangPage() {
           >
             <motion.h2
               variants={staggerItem}
-              className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl"
+              className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl dark:text-white"
             >
               Struktur Organisasi
             </motion.h2>
             <motion.p
               variants={staggerItem}
-              className="mx-auto mt-3 max-w-xl text-base text-gray-500"
+              className="mx-auto mt-3 max-w-xl text-base text-gray-500 dark:text-gray-400"
             >
               Struktur kepengurusan TEKAD UNM yang saling bersinergi untuk
               menghasilkan karya media terbaik.
@@ -436,7 +436,7 @@ export default function TentangPage() {
             variants={scaleIn}
           >
             <motion.div
-              className="group relative overflow-hidden rounded-2xl border border-amber-200/60 bg-gradient-to-br from-white via-amber-50/30 to-yellow-50/40 p-6 sm:p-8"
+              className="group relative overflow-hidden rounded-2xl border border-amber-200/60 bg-gradient-to-br from-white via-amber-50/30 to-yellow-50/40 p-6 sm:p-8 dark:border-amber-500/20 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900"
               whileHover={{
                 y: -5,
                 scale: 1.02,
@@ -475,7 +475,7 @@ export default function TentangPage() {
                 </span>
 
                 {/* Name */}
-                <h3 className="text-lg font-bold leading-snug text-gray-900 sm:text-xl">
+                <h3 className="text-lg font-bold leading-snug text-gray-900 sm:text-xl dark:text-white">
                   {pembinaData?.name ?? "—"}
                 </h3>
               </div>
@@ -492,7 +492,7 @@ export default function TentangPage() {
             style={{ transformOrigin: "top" }}
           >
             <div className="h-10 w-px bg-gradient-to-b from-amber-300 to-blue-300" />
-            <div className="h-3 w-3 rounded-full border-2 border-blue-400 bg-white" />
+            <div className="h-3 w-3 rounded-full border-2 border-blue-400 bg-white dark:bg-gray-950" />
             <div className="h-6 w-px bg-gradient-to-b from-blue-300 to-blue-200" />
           </motion.div>
 
@@ -533,7 +533,7 @@ export default function TentangPage() {
                       "0 25px 50px -12px rgba(59, 130, 246, 0.18), 0 0 25px -5px rgba(59, 130, 246, 0.08)",
                   }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white ring-1 ring-transparent transition-all duration-300 hover:${div.ringColor}`}
+                  className={`group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white ring-1 ring-transparent transition-all duration-300 hover:${div.ringColor} dark:border-gray-700 dark:bg-gray-900`}
                 >
                   {/* ── Card Header ── */}
                   <div
@@ -581,7 +581,7 @@ export default function TentangPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm font-semibold leading-snug text-gray-800">
+                            <p className="text-sm font-semibold leading-snug text-gray-800 dark:text-gray-200">
                               {member.name}
                             </p>
                           </div>
@@ -590,7 +590,7 @@ export default function TentangPage() {
                     </div>
 
                     {/* Divider */}
-                    <div className="mb-4 h-px bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100" />
+                    <div className="mb-4 h-px bg-gradient-to-r from-gray-100 via-gray-200 to-gray-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800" />
 
                     {/* Anggota Section */}
                     <div>
@@ -629,7 +629,7 @@ export default function TentangPage() {
                                 </span>
                               )}
                             </div>
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-600 dark:text-gray-300">
                               {member.name}
                             </span>
                           </motion.li>

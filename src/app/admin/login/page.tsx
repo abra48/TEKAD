@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-700 px-4 py-12 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-700 px-4 py-12 dark:from-gray-900 dark:via-blue-950 dark:to-indigo-950">
       {/* Background pattern */}
       <div className="pointer-events-none fixed inset-0 dot-grid opacity-10" />
 
@@ -77,8 +77,11 @@ export default function AdminLoginPage() {
             <Image src="https://i.ibb.co.com/yBR2Qd1g/Untitled-design-1.png" alt="Logo TEKAD" fill className="object-cover" sizes="56px" />
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            Admin Panel
+            TEKAD UNM
           </h1>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+            Admin Panel
+          </p>
           <p className="mt-2 text-sm text-white/60">
             Masuk ke dashboard TEKAD UNM
           </p>
