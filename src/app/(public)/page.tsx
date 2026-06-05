@@ -68,17 +68,20 @@ export default function BerandaPage() {
   const [gallery, setGallery] = useState<GalleryItem[]>([]);
   const [loadingArticles, setLoadingArticles] = useState(true);
 
-  /* Derive hero slides from published articles (max 3) */
-  const heroSlides = articles.length > 0
-    ? articles.slice(0, 3).map((a) => ({
-        title: a.title,
-        excerpt: a.excerpt || "",
-        category: a.categories?.name || "Berita",
-        slug: a.slug || a.id,
-        thumbnail: a.thumbnail_url || null,
-        date: new Date(a.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
-      }))
-    : fallbackSlides.map((s) => ({ ...s, thumbnail: null as string | null, date: "" }));
+  /* Hero slides: welcome first, then latest articles */
+  const articleSlides = articles.slice(0, 3).map((a) => ({
+    title: a.title,
+    excerpt: a.excerpt || "",
+    category: a.categories?.name || "Berita",
+    slug: a.slug || a.id,
+    thumbnail: a.thumbnail_url || null,
+    date: new Date(a.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+  }));
+
+  const heroSlides = [
+    { ...fallbackSlides[0], thumbnail: null as string | null, date: "" },
+    ...articleSlides,
+  ];
 
   const slideCount = heroSlides.length;
 
@@ -147,8 +150,10 @@ export default function BerandaPage() {
             </div>
           ))}
 
-          <button onClick={prevSlide} className="absolute left-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white/60 backdrop-blur-sm transition hover:bg-white/20 hover:text-white sm:left-5" aria-label="Previous"><ChevronLeft className="h-5 w-5" /></button>
-          <button onClick={nextSlide} className="absolute right-2 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white/60 backdrop-blur-sm transition hover:bg-white/20 hover:text-white sm:right-5" aria-label="Next"><ChevronRight className="h-5 w-5" /></button>
+          <div className="absolute bottom-14 right-4 z-10 flex items-center gap-2 sm:right-6">
+            <button onClick={prevSlide} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 backdrop-blur-sm transition hover:bg-white/20 hover:text-white" aria-label="Previous"><ChevronLeft className="h-5 w-5" /></button>
+            <button onClick={nextSlide} className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/60 backdrop-blur-sm transition hover:bg-white/20 hover:text-white" aria-label="Next"><ChevronRight className="h-5 w-5" /></button>
+          </div>
 
           <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
             {heroSlides.map((_, i) => (<button key={i} onClick={() => setCurrentSlide(i)} className={`h-1.5 rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 bg-white" : "w-1.5 bg-white/30 hover:bg-white/50"}`} aria-label={`Slide ${i + 1}`} />))}
