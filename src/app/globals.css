@@ -3,26 +3,66 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════
-   DESIGN TOKENS & BASE
+   DESIGN TOKENS
    ═══════════════════════════════════════════════ */
-
-:root {
-  --accent: 217 91% 60%;
-  --accent-foreground: 0 0% 100%;
-  --surface-glass: rgba(255, 255, 255, 0.03);
-  --border-glass: rgba(255, 255, 255, 0.06);
-  --glow-accent: rgba(59, 130, 246, 0.15);
-}
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  color: #0f0f10;
-  background: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════
+   GLOBAL SMOOTHNESS
+   ═══════════════════════════════════════════════ */
+
+/* Smooth dark mode toggle — bg/color/border transition on everything */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Exclude elements where transition causes layout jank */
+*[class*="animate-"],
+*[class*="transition-"],
+.animate-spin,
+.animate-pulse,
+.animate-marquee {
+  transition-property: none;
+}
+
+/* Re-enable explicit transitions on elements that use Tailwind transition classes */
+*[class*="transition-all"] { transition-property: all; }
+*[class*="transition-colors"] { transition-property: background-color, border-color, color, fill, stroke; }
+*[class*="transition-opacity"] { transition-property: opacity; }
+*[class*="transition-shadow"] { transition-property: box-shadow; }
+*[class*="transition-transform"] { transition-property: transform; }
+
+/* Smooth hover feel for all interactive elements */
+a, button, [role="button"], input, textarea, select, summary {
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page load fade-in */
+@keyframes page-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+body {
+  animation: page-fade-in 0.35s ease-out;
+}
+
+/* Smooth image rendering */
+img, video {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
 }
 
 /* ═══════════════════════════════════════════════
@@ -39,68 +79,29 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.2);
+  background: rgba(100, 116, 139, 0.18);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(100, 116, 139, 0.35);
 }
 
-/* Dark scrollbar for admin */
-.dark-scroll::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.15);
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.12);
 }
 
-.dark-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.3);
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.25);
 }
 
 /* ═══════════════════════════════════════════════
-   GLASSMORPHISM UTILITIES
+   UTILITY CLASSES
    ═══════════════════════════════════════════════ */
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
-  }
-
-  /* Glass card for dark surfaces */
-  .glass {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  .glass-md {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
-
-  /* Glass card for light surfaces */
-  .glass-light {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-
-  /* Glow effects */
-  .glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1),
-                0 0 60px rgba(59, 130, 246, 0.05);
-  }
-
-  .glow-sm {
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.08);
-  }
-
-  .glow-border {
-    box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.1),
-                0 0 20px rgba(59, 130, 246, 0.06);
   }
 
   /* Dot grid pattern */
@@ -121,81 +122,71 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-
-  .text-gradient-light {
-    background: linear-gradient(135deg, #60a5fa, #818cf8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
 }
 
 /* ═══════════════════════════════════════════════
-   ANIMATIONS
+   ANIMATIONS (subtle only)
    ═══════════════════════════════════════════════ */
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
 
 /* ═══════════════════════════════════════════════
-   ADMIN DARK THEME BASE
+   ADMIN INPUT — Light (default) / Dark
    ═══════════════════════════════════════════════ */
 
-.admin-dark {
-  color-scheme: dark;
-  background: #08090a;
-  color: #e2e8f0;
-}
-
-.admin-dark input,
-.admin-dark textarea,
-.admin-dark select {
-  color-scheme: dark;
-}
-
-/* Admin input styling */
 .admin-input {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #1e293b;
   transition: all 0.2s ease;
 }
 
 .admin-input:focus {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(59, 130, 246, 0.4);
+  background: #ffffff;
+  border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   outline: none;
 }
 
 .admin-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Dark mode admin inputs */
+.dark .admin-input {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.dark .admin-input:focus {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.dark .admin-input::placeholder {
   color: rgba(148, 163, 184, 0.4);
+}
+
+/* ═══════════════════════════════════════════════
+   DARK MODE BODY
+   ═══════════════════════════════════════════════ */
+
+.dark {
+  color-scheme: dark;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  color-scheme: dark;
 }

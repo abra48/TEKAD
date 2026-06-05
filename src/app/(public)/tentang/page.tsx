@@ -216,10 +216,11 @@ export default function TentangPage() {
           >
             <motion.div
               variants={staggerItem}
-              className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-sm font-medium text-blue-700"
+              className="mb-5 flex items-center justify-center gap-3"
             >
-              <Sparkles className="h-4 w-4" />
-              <span>Profil Organisasi</span>
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-blue-600" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-blue-600">Media & Publikasi</span>
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-blue-600" />
             </motion.div>
 
             <motion.h1
@@ -289,7 +290,7 @@ export default function TentangPage() {
       </section>
 
       {/* ─────────────── VISI & MISI ─────────────── */}
-      <section className="bg-gradient-to-b from-white via-slate-50/50 to-white py-16 sm:py-20">
+      <section id="visi-misi" className="scroll-mt-20 bg-gradient-to-b from-white via-slate-50/50 to-white py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div
             className="mb-12 text-center"
@@ -385,7 +386,7 @@ export default function TentangPage() {
       </section>
 
       {/* ─────────────── STRUKTUR ORGANISASI ─────────────── */}
-      <section className="relative overflow-hidden py-16 sm:py-24">
+      <section id="divisi" className="scroll-mt-20 relative overflow-hidden py-16 sm:py-24">
         {/* Background texture */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-gradient-to-b from-blue-50/80 to-transparent blur-3xl" />

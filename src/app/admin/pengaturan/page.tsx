@@ -1,189 +1,81 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Settings,
-  Save,
-  ToggleLeft,
-  Building2,
-  Phone,
-  Mail,
-  AtSign,
-  Film,
-  Globe,
-  FileText,
-} from "lucide-react";
+import { useState, useEffect, FormEvent } from "react";
+import { Settings, Key, Eye, EyeOff, CheckCircle2, AlertCircle, Loader2, Shield, Bell, Globe } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
-export default function PengaturanPage() {
-  const [pendaftaranOpen, setPendaftaranOpen] = useState(true);
+export default function AdminPengaturanPage() {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const [profil, setProfil] = useState({
-    nama: "TEKAD UNM",
-    tagline: "Tim Edukasi, Kreativitas, Aspirasi & Dedikasi",
-    visi: "Menjadi pusat informasi dan penggerak media kreatif terdepan di lingkungan Administrasi Bisnis UNM yang profesional, inovatif, dan berdampak positif.",
-    misi: "Menyajikan informasi akurat dan bermanfaat.\nMengembangkan keterampilan jurnalistik anggota.\nMengelola aset media digital secara profesional.",
-    deskripsi: "Unit Kegiatan Mahasiswa Universitas Negeri Makassar yang bergerak di bidang jurnalistik dan media kampus.",
-  });
+  const [registrationOpen, setRegistrationOpen] = useState(true);
+  const [notifEmail, setNotifEmail] = useState(true);
 
-  const [kontak, setKontak] = useState({
-    email: "redaksi.tekad@unm.ac.id",
-    whatsapp: "+6281234567890",
-    instagram: "https://instagram.com/tekadunm",
-    tiktok: "https://tiktok.com/@tekadunm",
-    youtube: "https://youtube.com/@tekadunm",
-  });
-
-  const handleSave = () => {
-    alert("Pengaturan berhasil disimpan!");
+  const handlePasswordSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+    if (newPassword !== confirmPassword) { setMessage({ type: "error", text: "Password baru tidak cocok." }); return; }
+    if (newPassword.length < 6) { setMessage({ type: "error", text: "Password minimal 6 karakter." }); return; }
+    setIsLoading(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      setMessage({ type: "success", text: "Password berhasil diperbarui!" });
+      setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
+    } catch (err: any) { setMessage({ type: "error", text: err?.message || "Gagal memperbarui password." }); } finally { setIsLoading(false); }
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">
-            Pengaturan
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Konfigurasi dan informasi publik TEKAD UNM
-          </p>
+    <div className="mx-auto max-w-2xl space-y-8">
+      <div><h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pengaturan</h1><p className="mt-1 text-sm text-gray-500">Kelola akun dan konfigurasi admin panel</p></div>
+
+      {/* Password */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex items-center gap-3 border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600"><Key className="h-4 w-4 text-white" /></div>
+          <div><h2 className="text-sm font-bold text-gray-900 dark:text-white">Ubah Password</h2><p className="text-[11px] text-gray-400">Perbarui password akun admin Anda</p></div>
         </div>
-        <button
-          onClick={handleSave}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:shadow-xl active:scale-[0.98]"
-        >
-          <Save className="h-4 w-4" />
-          Simpan
-        </button>
+        <form onSubmit={handlePasswordSubmit} className="space-y-5 p-6">
+          {message && (
+            <div className={`flex items-center gap-2.5 rounded-xl border px-4 py-3 text-sm font-medium ${message.type === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400" : "border-red-200 bg-red-50 text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400"}`}>
+              {message.type === "success" ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}{message.text}
+            </div>
+          )}
+          <div><label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-400">Password Saat Ini</label><input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" placeholder="••••••••" /></div>
+          <div><label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-400">Password Baru</label>
+            <div className="relative"><input type={showNewPass ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className="admin-input w-full rounded-xl px-4 py-2.5 pr-11 text-sm" placeholder="Minimal 6 karakter" /><button type="button" onClick={() => setShowNewPass(!showNewPass)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">{showNewPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div>
+          </div>
+          <div><label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-400">Konfirmasi Password Baru</label><input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" placeholder="Ulangi password baru" /></div>
+          <button type="submit" disabled={isLoading} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:shadow-xl active:scale-[0.98] disabled:opacity-60">
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Key className="h-4 w-4" />} Perbarui Password
+          </button>
+        </form>
       </div>
 
-      <div className="mx-auto max-w-3xl space-y-5">
-        {/* Status Pendaftaran */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-          <div className="flex items-center gap-2 border-b border-white/[0.04] px-6 py-4">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
-              <ToggleLeft className="h-3.5 w-3.5 text-blue-400" />
-            </div>
-            <h2 className="text-sm font-bold text-white">Status Pendaftaran</h2>
-          </div>
-          <div className="p-6">
-            <label className="flex cursor-pointer items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.01] p-5 transition hover:border-white/[0.08]">
-              <div>
-                <p className="text-sm font-semibold text-slate-200">Buka Form Pendaftaran</p>
-                <p className="mt-1 text-xs text-slate-600">
-                  Formulir di{" "}
-                  <code className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] font-mono text-blue-400">/daftar</code>{" "}
-                  akan dapat diakses publik.
-                </p>
-              </div>
-              <div className="relative ml-4 shrink-0">
-                <input type="checkbox" checked={pendaftaranOpen} onChange={(e) => setPendaftaranOpen(e.target.checked)} className="peer sr-only" />
-                <div className={`h-7 w-12 rounded-full transition-colors ${pendaftaranOpen ? "bg-blue-500" : "bg-slate-700"}`} />
-                <div className={`absolute left-[3px] top-[3px] h-[22px] w-[22px] rounded-full bg-white shadow-sm transition-transform ${pendaftaranOpen ? "translate-x-5" : ""}`} />
-              </div>
-            </label>
-            <div className="mt-3 flex items-center gap-2">
-              <span className={`h-2 w-2 rounded-full ${pendaftaranOpen ? "bg-emerald-400" : "bg-slate-600"}`} />
-              <span className="text-xs text-slate-500">
-                Status:{" "}
-                <span className={pendaftaranOpen ? "text-emerald-400" : "text-slate-500"}>
-                  {pendaftaranOpen ? "Dibuka" : "Ditutup"}
-                </span>
-              </span>
-            </div>
-          </div>
+      {/* Toggles */}
+      <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white dark:border-gray-800 dark:bg-gray-900">
+        <div className="flex items-center gap-3 border-b border-gray-100 px-6 py-4 dark:border-gray-800">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800"><Settings className="h-4 w-4 text-gray-500 dark:text-gray-400" /></div>
+          <div><h2 className="text-sm font-bold text-gray-900 dark:text-white">Konfigurasi</h2><p className="text-[11px] text-gray-400">Pengaturan sistem dan fitur</p></div>
         </div>
-
-        {/* Profil Organisasi */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-          <div className="flex items-center gap-2 border-b border-white/[0.04] px-6 py-4">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10">
-              <Building2 className="h-3.5 w-3.5 text-indigo-400" />
-            </div>
-            <h2 className="text-sm font-bold text-white">Profil Organisasi</h2>
+        <div className="divide-y divide-gray-50 dark:divide-gray-800">
+          <div className="flex items-center justify-between px-6 py-5">
+            <div className="flex items-center gap-3"><Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" /><div><p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Buka Pendaftaran</p><p className="text-[11px] text-gray-400">Izinkan anggota baru untuk mendaftar</p></div></div>
+            <button type="button" onClick={() => setRegistrationOpen(!registrationOpen)} className={`relative flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ${registrationOpen ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700"}`} role="switch" aria-checked={registrationOpen}>
+              <span className={`h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200 ${registrationOpen ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
+            </button>
           </div>
-          <div className="space-y-5 p-6">
-            <div>
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                <Building2 className="h-3 w-3" /> Nama Organisasi
-              </label>
-              <input type="text" value={profil.nama} onChange={(e) => setProfil({ ...profil, nama: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                <FileText className="h-3 w-3" /> Tagline
-              </label>
-              <input type="text" value={profil.tagline} onChange={(e) => setProfil({ ...profil, tagline: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Deskripsi Singkat</label>
-              <textarea value={profil.deskripsi} onChange={(e) => setProfil({ ...profil, deskripsi: e.target.value })} rows={2} className="admin-input w-full resize-none rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Visi</label>
-              <textarea value={profil.visi} onChange={(e) => setProfil({ ...profil, visi: e.target.value })} rows={3} className="admin-input w-full resize-none rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500">Misi</label>
-              <textarea value={profil.misi} onChange={(e) => setProfil({ ...profil, misi: e.target.value })} rows={4} placeholder="Pisahkan setiap poin misi dengan baris baru..." className="admin-input w-full resize-none rounded-xl px-4 py-2.5 text-sm" />
-            </div>
+          <div className="flex items-center justify-between px-6 py-5">
+            <div className="flex items-center gap-3"><Bell className="h-4 w-4 text-amber-600 dark:text-amber-400" /><div><p className="text-sm font-semibold text-gray-800 dark:text-gray-200">Notifikasi Email</p><p className="text-[11px] text-gray-400">Kirim notifikasi saat ada pendaftar baru</p></div></div>
+            <button type="button" onClick={() => setNotifEmail(!notifEmail)} className={`relative flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ${notifEmail ? "bg-blue-600" : "bg-gray-200 dark:bg-gray-700"}`} role="switch" aria-checked={notifEmail}>
+              <span className={`h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-200 ${notifEmail ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
+            </button>
           </div>
-        </div>
-
-        {/* Kontak & Sosial Media */}
-        <div className="overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.02]">
-          <div className="flex items-center gap-2 border-b border-white/[0.04] px-6 py-4">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10">
-              <Phone className="h-3.5 w-3.5 text-emerald-400" />
-            </div>
-            <h2 className="text-sm font-bold text-white">Kontak & Sosial Media</h2>
-          </div>
-          <div className="space-y-5 p-6">
-            <div className="grid gap-5 sm:grid-cols-2">
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  <Mail className="h-3 w-3" /> Email
-                </label>
-                <input type="email" value={kontak.email} onChange={(e) => setKontak({ ...kontak, email: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-              </div>
-              <div>
-                <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  <Phone className="h-3 w-3" /> WhatsApp
-                </label>
-                <input type="text" value={kontak.whatsapp} onChange={(e) => setKontak({ ...kontak, whatsapp: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-              </div>
-            </div>
-
-            <div className="h-px bg-white/[0.04]" />
-
-            <div>
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                <AtSign className="h-3 w-3" /> URL Instagram
-              </label>
-              <input type="url" value={kontak.instagram} onChange={(e) => setKontak({ ...kontak, instagram: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                <Film className="h-3 w-3" /> URL TikTok
-              </label>
-              <input type="url" value={kontak.tiktok} onChange={(e) => setKontak({ ...kontak, tiktok: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                <Globe className="h-3 w-3" /> URL YouTube
-              </label>
-              <input type="url" value={kontak.youtube} onChange={(e) => setKontak({ ...kontak, youtube: e.target.value })} className="admin-input w-full rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-          </div>
-        </div>
-
-        {/* Save */}
-        <div className="flex justify-end pb-4">
-          <button onClick={handleSave} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all hover:shadow-xl active:scale-[0.98]">
-            <Save className="h-4 w-4" />
-            Simpan Pengaturan
-          </button>
         </div>
       </div>
     </div>
