@@ -6,8 +6,8 @@ import Image from "next/image";
 import {
   Users, Newspaper, CalendarDays, ArrowRight, ChevronRight, ChevronLeft,
   Globe, AtSign, Film, PenLine, Monitor, Camera, Lightbulb, Megaphone,
-  GraduationCap, Target, Handshake, Award, Rocket, BarChart3, Mic,
-  Heart, Briefcase, Palette, Presentation, Wrench, Zap, Layers,
+  GraduationCap, Target, Award, Rocket, BarChart3, Mic,
+  Heart, Briefcase, Palette, Wrench, Zap, Layers, MessageSquare,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -23,9 +23,9 @@ const iconKeywords: [string[], React.ComponentType<{ className?: string }>][] = 
   [["website", "web", "digital", "teknologi", "it"], Monitor],
   [["sosial", "pengabdian", "volunteer", "peduli"], Heart],
   [["lomba", "kompetisi", "prestasi", "juara"], Award],
-  [["rapat", "musyawarah", "diskusi", "forum"], Presentation],
+  [["rapat", "musyawarah", "diskusi", "forum"], MessageSquare],
   [["rekrut", "pendaftaran", "anggota", "kader"], Users],
-  [["kerja sama", "kolaborasi", "mitra", "partner"], Handshake],
+  [["kerja sama", "kolaborasi", "mitra", "partner"], Users],
   [["riset", "penelitian", "analisis", "data"], BarChart3],
   [["publikasi", "penerbitan", "majalah", "buletin"], Newspaper],
   [["inovasi", "ide", "gagasan"], Lightbulb],

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -33,15 +33,14 @@ interface Article {
 }
 
 /* ═══════════════════════════════════════════════
-   DETAIL BERITA PAGE — Elegant Redesign
+   DETAIL BERITA PAGE — Next.js 14
    ═══════════════════════════════════════════════ */
 
 export default function DetailBeritaPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const resolvedParams = use(params);
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -53,7 +52,7 @@ export default function DetailBeritaPage({
         const { data, error } = await supabase
           .from("news_articles")
           .select("*, categories(name)")
-          .eq("slug", resolvedParams.slug)
+          .eq("slug", params.slug)
           .single();
 
         if (error || !data) {
@@ -69,7 +68,7 @@ export default function DetailBeritaPage({
       }
     }
     fetchArticle();
-  }, [resolvedParams.slug]);
+  }, [params.slug]);
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString("id-ID", {
