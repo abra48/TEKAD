@@ -12,7 +12,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 
 interface Program { id: string; title: string; description: string; icon_name?: string; is_active: boolean; }
-interface Article { id: string; title: string; slug?: string; excerpt?: string; status: string; is_featured: boolean; thumbnail_url?: string | null; created_at: string; categories?: { name: string } | null; }
+interface Article { id: string; title: string; slug?: string; excerpt?: string; status: string; is_featured: boolean; thumbnail_url?: string | null; created_at: string; published_at?: string | null; categories?: { name: string } | null; }
 interface GalleryItem { id: string; title: string; image_url: string | null; caption?: string; }
 
 /* Icon mapping — picks professional icons based on program title keywords */
@@ -75,7 +75,7 @@ export default function BerandaPage() {
     category: a.categories?.name || "Berita",
     slug: a.slug || a.id,
     thumbnail: a.thumbnail_url || null,
-    date: new Date(a.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
+    date: new Date(a.published_at || a.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }),
   }));
 
   const heroSlides = [
@@ -189,7 +189,7 @@ export default function BerandaPage() {
                       <div className="absolute left-4 top-4"><span className="text-[10px] font-black uppercase tracking-widest text-white drop-shadow-md">{featured.categories?.name || "UMUM"}</span></div>
                     </div>
                     <div className="p-6 sm:p-8">
-                      <time className="text-xs font-medium text-gray-400">{formatDate(featured.created_at)}</time>
+                      <time className="text-xs font-medium text-gray-400">{formatDate(featured.published_at || featured.created_at)}</time>
                       <h3 className="mt-2 text-xl font-bold leading-snug text-gray-900 transition-colors group-hover:text-blue-600 sm:text-2xl dark:text-white dark:group-hover:text-blue-400">{featured.title}</h3>
                       {featured.excerpt && <p className="mt-3 line-clamp-2 text-sm text-gray-500">{featured.excerpt}</p>}
                       <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400">Baca Selengkapnya <ArrowRight className="h-3.5 w-3.5" /></span>
@@ -201,7 +201,7 @@ export default function BerandaPage() {
                 {side.map((a) => (
                   <Link key={a.id} href={`/berita/${a.slug || a.id}`} className="group flex gap-4 rounded-xl border border-gray-100 bg-white p-4 transition-all duration-200 hover:shadow-lg hover:shadow-gray-900/[0.04] dark:border-gray-800 dark:bg-gray-900">
                     <div className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">{a.thumbnail_url ? <img src={a.thumbnail_url} alt={a.title} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center"><Newspaper className="h-5 w-5 text-gray-300 dark:text-gray-700" /></div>}</div>
-                    <div className="min-w-0 flex-1"><span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">{a.categories?.name || "UMUM"}</span><h4 className="mt-1 line-clamp-2 text-sm font-bold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">{a.title}</h4><time className="mt-1.5 text-[11px] text-gray-400">{formatDate(a.created_at)}</time></div>
+                    <div className="min-w-0 flex-1"><span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">{a.categories?.name || "UMUM"}</span><h4 className="mt-1 line-clamp-2 text-sm font-bold text-gray-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">{a.title}</h4><time className="mt-1.5 text-[11px] text-gray-400">{formatDate(a.published_at || a.created_at)}</time></div>
                   </Link>
                 ))}
               </div>
