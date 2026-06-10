@@ -15,6 +15,7 @@ import {
   Clock,
   Archive,
   Rocket,
+  CalendarDays,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -30,6 +31,7 @@ interface Article {
   is_featured: boolean;
   thumbnail_url?: string | null;
   created_at: string;
+  published_at?: string | null;
   categories?: { name: string } | null;
 }
 
@@ -62,7 +64,6 @@ export default function AdminBeritaPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   // Fetch articles from Supabase
   const fetchArticles = async () => {
@@ -90,12 +91,30 @@ export default function AdminBeritaPage() {
     fetchArticles();
   }, []);
 
-  // Close context menu on outside click
-  useEffect(() => {
-    const handleClick = () => setActiveMenu(null);
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, []);
+  // Handle inline date change
+  const handleDateChange = async (id: string, newDate: string) => {
+    if (!newDate) return;
+    try {
+      const supabase = createClient();
+      const isoDate = new Date(newDate).toISOString();
+      const { error } = await supabase
+        .from("news_articles")
+        .update({ published_at: isoDate })
+        .eq("id", id);
+      if (error) {
+        alert(`Gagal mengubah tanggal: ${error.message}`);
+      } else {
+        setArticles((prev) =>
+          prev.map((a) =>
+            a.id === id ? { ...a, published_at: isoDate } : a
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Date change error:", err);
+      alert("Gagal mengubah tanggal posting.");
+    }
+  };
 
   // Filter
   const filtered = articles.filter((a) =>
@@ -311,9 +330,22 @@ export default function AdminBeritaPage() {
                           {st.label}
                         </span>
                       </td>
-                      {/* Date */}
-                      <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
-                        {formatDate(item.created_at)}
+                      {/* Date — editable */}
+                      <td className="whitespace-nowrap px-5 py-4">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          <input
+                            type="date"
+                            value={
+                              item.published_at
+                                ? new Date(item.published_at).toISOString().split("T")[0]
+                                : new Date(item.created_at).toISOString().split("T")[0]
+                            }
+                            onChange={(e) => handleDateChange(item.id, e.target.value)}
+                            title="Atur tanggal posting"
+                            className="w-[130px] cursor-pointer rounded-lg border border-gray-200 bg-gray-50/50 px-2 py-1 text-xs text-gray-600 transition-all hover:border-blue-300 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                          />
+                        </div>
                       </td>
                       {/* Actions */}
                       <td className="px-5 py-4">

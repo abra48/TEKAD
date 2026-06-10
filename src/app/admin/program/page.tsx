@@ -7,7 +7,6 @@ import {
   Plus,
   RefreshCw,
   Search,
-  MoreVertical,
   Edit3,
   Trash2,
   Eye,
@@ -43,7 +42,7 @@ export default function AdminProgramPage() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
 
   // Modal states
   const [deleteTarget, setDeleteTarget] = useState<Program | null>(null);
@@ -84,12 +83,7 @@ export default function AdminProgramPage() {
     fetchPrograms();
   }, []);
 
-  // Close context menu on click outside
-  useEffect(() => {
-    const handleClick = () => setActiveMenu(null);
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, []);
+
 
   // Filter programs by search and status
   const filtered = programs.filter((p) => {
@@ -116,7 +110,7 @@ export default function AdminProgramPage() {
   // ── Toggle active/draft ──
   const handleToggleStatus = async (program: Program) => {
     setToggleLoading(program.id);
-    setActiveMenu(null);
+
     try {
       const supabase = createClient();
       const { error } = await supabase
@@ -169,7 +163,7 @@ export default function AdminProgramPage() {
     setEditDescription(program.description);
     setEditIsActive(program.is_active);
     setEditError(null);
-    setActiveMenu(null);
+
   };
 
   // ── Save edit ──
@@ -409,69 +403,52 @@ export default function AdminProgramPage() {
                         {formatDate(program.created_at)}
                       </span>
                     </td>
-                    {/* Actions */}
+                    {/* Actions — inline buttons */}
                     <td className="px-4 py-4 text-center sm:px-6">
-                      <div className="relative inline-block">
+                      <div className="flex items-center justify-center gap-1">
+                        {/* View */}
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveMenu(
-                              activeMenu === program.id ? null : program.id
-                            );
-                          }}
-                          className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                          onClick={() => setViewTarget(program)}
+                          title="Lihat Detail"
+                          className="group/btn flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-all hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10 dark:hover:text-blue-400"
                         >
-                          <MoreVertical className="h-4 w-4" />
+                          <Eye className="h-4 w-4" />
                         </button>
-                        {/* Dropdown */}
-                        {activeMenu === program.id && (
-                          <div className="absolute right-0 top-full z-20 mt-1 w-48 overflow-hidden rounded-xl border border-gray-200/80 bg-white py-1 shadow-xl shadow-gray-900/10 dark:border-gray-700 dark:bg-gray-800">
-                            <button
-                              onClick={() => {
-                                setViewTarget(program);
-                                setActiveMenu(null);
-                              }}
-                              className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                            >
-                              <Eye className="h-4 w-4" />
-                              Lihat Detail
-                            </button>
-                            <button
-                              onClick={() => openEditModal(program)}
-                              className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                            >
-                              <Edit3 className="h-4 w-4" />
-                              Edit Program
-                            </button>
-                            <button
-                              onClick={() => handleToggleStatus(program)}
-                              className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
-                            >
-                              {program.is_active ? (
-                                <>
-                                  <EyeOff className="h-4 w-4" />
-                                  Jadikan Draf
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                  Publish
-                                </>
-                              )}
-                            </button>
-                            <div className="my-1 h-px bg-gray-100 dark:bg-gray-700" />
-                            <button
-                              onClick={() => {
-                                setDeleteTarget(program);
-                                setActiveMenu(null);
-                              }}
-                              className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Hapus
-                            </button>
-                          </div>
-                        )}
+                        {/* Edit */}
+                        <button
+                          onClick={() => openEditModal(program)}
+                          title="Edit Program"
+                          className="group/btn flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-all hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-500/10 dark:hover:text-amber-400"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </button>
+                        {/* Toggle Status */}
+                        <button
+                          onClick={() => handleToggleStatus(program)}
+                          disabled={toggleLoading === program.id}
+                          title={program.is_active ? "Jadikan Draf" : "Publish"}
+                          className={`group/btn flex h-8 w-8 items-center justify-center rounded-lg transition-all disabled:opacity-50 ${
+                            program.is_active
+                              ? "text-gray-400 hover:bg-orange-50 hover:text-orange-600 dark:hover:bg-orange-500/10 dark:hover:text-orange-400"
+                              : "text-gray-400 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400"
+                          }`}
+                        >
+                          {toggleLoading === program.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : program.is_active ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <CheckCircle2 className="h-4 w-4" />
+                          )}
+                        </button>
+                        {/* Delete */}
+                        <button
+                          onClick={() => setDeleteTarget(program)}
+                          title="Hapus Program"
+                          className="group/btn flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>

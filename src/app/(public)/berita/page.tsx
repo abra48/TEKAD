@@ -169,7 +169,7 @@ export default async function BeritaPage({
                   {/* Content */}
                   <div className="flex flex-1 flex-col p-5 sm:p-6">
                     <time className="mb-2 text-xs font-medium text-gray-400">
-                      {new Date(news.created_at).toLocaleDateString("id-ID", {
+                      {new Date(news.published_at || news.created_at).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "short",
                         year: "numeric",

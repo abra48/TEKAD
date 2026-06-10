@@ -29,6 +29,7 @@ interface Article {
   is_featured: boolean;
   thumbnail_url?: string | null;
   created_at: string;
+  published_at?: string | null;
   categories?: { name: string } | null;
 }
 
@@ -149,7 +150,7 @@ export default function DetailBeritaPage({
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-gray-400 dark:text-gray-500">
             <span className="inline-flex items-center gap-1.5">
               <CalendarDays className="h-4 w-4 text-blue-500/60" />
-              {formatDate(article.created_at)}
+              {formatDate(article.published_at || article.created_at)}
             </span>
             <span className="hidden h-1 w-1 rounded-full bg-gray-300 sm:block dark:bg-gray-700" />
             <span className="inline-flex items-center gap-1.5">

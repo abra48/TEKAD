@@ -26,6 +26,7 @@ import {
   X,
   Loader2,
   AlertCircle,
+  CalendarDays,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { uploadFile } from "@/lib/supabase/storage";
@@ -73,6 +74,7 @@ export default function EditBeritaPage({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [publishedAt, setPublishedAt] = useState("");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [categories, setCategories] = useState<any[]>([]);
@@ -111,6 +113,11 @@ export default function EditBeritaPage({
         if (data.thumbnail_url) {
           setExistingThumbnail(data.thumbnail_url);
           setThumbnailPreview(data.thumbnail_url);
+        }
+        if (data.published_at) {
+          setPublishedAt(new Date(data.published_at).toISOString().slice(0, 16));
+        } else if (data.created_at) {
+          setPublishedAt(new Date(data.created_at).toISOString().slice(0, 16));
         }
       } catch (err) {
         console.error("Fetch error:", err);
@@ -179,6 +186,7 @@ export default function EditBeritaPage({
           status,
           is_featured: isFeatured,
           thumbnail_url: imageUrl,
+          published_at: publishedAt ? new Date(publishedAt).toISOString() : null,
         })
         .eq("id", params.id);
 
@@ -414,6 +422,29 @@ export default function EditBeritaPage({
                   <div className="absolute left-[2px] top-[2px] h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
                 </div>
               </label>
+            </div>
+          </div>
+
+          {/* Tanggal Posting */}
+          <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white dark:border-gray-800 dark:bg-gray-900">
+            <div className="border-b border-gray-100 px-5 py-3 dark:border-gray-800">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Tanggal Posting</p>
+            </div>
+            <div className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-500 dark:bg-blue-500/10 dark:text-blue-400">
+                  <CalendarDays className="h-4 w-4" />
+                </div>
+                <input
+                  type="datetime-local"
+                  value={publishedAt}
+                  onChange={(e) => setPublishedAt(e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-700 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-blue-500"
+                />
+              </div>
+              <p className="mt-2 text-[11px] text-gray-400">
+                Atur kapan berita ini ditampilkan sebagai tanggal posting.
+              </p>
             </div>
           </div>
 
